@@ -94,7 +94,7 @@ The library ease the search by using a set of methods described below. But keep 
 
 The filtering options **are the first settings applied to the Iterator before anything else**. The filters follow the *First In First Out* rule.
 
-#### addFilter($callable)
+#### addWhere($callable)
 
 The `addFilter` method adds a callable filter function each time it is called. The function can take up to three parameters:
 
@@ -102,15 +102,15 @@ The `addFilter` method adds a callable filter function each time it is called. T
 * the current iterator key;
 * the iterator object;
 
-#### removeFilter($callable)
+#### removeWhere($callable)
 
 `removeFilter` method removes an already registered filter function. If the function was registered multiple times, you will have to call `removeFilter` as often as the filter was registered. **The first registered copy will be the first to be removed.**
 
-#### hasFilter($callable)
+#### hasWhere($callable)
 
 `hasFilter` method checks if the filter function is already registered
 
-#### clearFilter()
+#### clearWhere()
 
 `clearFilter` method removes all registered filter functions.
 
@@ -187,7 +187,7 @@ $stmt = new P\IQuery($csv);
 $iterator = $stmt
     ->setOffset(3)
     ->setLimit(2)
-    ->addFilter('filterByEmail')
+    ->addWhere('filterByEmail')
     ->addSortBy('sortByLastName')
     ->addSelect(function ($value) {
         return array_map('strtoupper', $value);

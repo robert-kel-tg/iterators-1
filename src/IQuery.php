@@ -3,6 +3,7 @@
 namespace P\IQuery;
 
 use Iterator;
+use IteratorAggregate;
 
 /**
  *  A Class to Query in a SQL-like manner Iterators

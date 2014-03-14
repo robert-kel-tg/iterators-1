@@ -65,12 +65,12 @@ class IQueryTest extends PHPUnit_Framework_TestCase
         $this->assertCount(1, $res);
     }
 
-    public function testFilter()
+    public function testWhere()
     {
         $func = function ($row) {
             return false !== strpos($row, 'o');
         };
-        $this->stmt->setFilter($func);
+        $this->stmt->setWhere($func);
 
         $iterator =$this->stmt->query();
         $this->assertCount(2, iterator_to_array($iterator, false));
@@ -78,17 +78,17 @@ class IQueryTest extends PHPUnit_Framework_TestCase
         $func2 = function ($row) {
             return false !== strpos($row, 'j');
         };
-        $this->stmt->addFilter($func2);
-        $this->stmt->addFilter($func);
+        $this->stmt->addWhere($func2);
+        $this->stmt->addWhere($func);
 
         $iterator = $this->stmt->query();
         $this->assertCount(1, iterator_to_array($iterator, false));
 
-        $this->stmt->addFilter($func2);
-        $this->stmt->addFilter($func);
-        $this->assertTrue($this->stmt->hasFilter($func2));
-        $this->stmt->removeFilter($func2);
-        $this->assertFalse($this->stmt->hasFilter($func2));
+        $this->stmt->addWhere($func2);
+        $this->stmt->addWhere($func);
+        $this->assertTrue($this->stmt->hasWhere($func2));
+        $this->stmt->removeWhere($func2);
+        $this->assertFalse($this->stmt->hasWhere($func2));
 
         $iterator = $this->stmt->query();
         $this->assertCount(2, iterator_to_array($iterator, false));

@@ -8,7 +8,7 @@ use Iterator;
 /**
  *  A Trait to filter Iterators
  */
-trait Filter
+trait Where
 {
     /**
      * Callable function to filter the iterator
@@ -28,9 +28,9 @@ trait Filter
      *
      * @return self
      */
-    public function setFilter(callable $callable)
+    public function setWhere(callable $callable)
     {
-        return $this->addFilter($callable);
+        return $this->addWhere($callable);
     }
 
     /**
@@ -40,7 +40,7 @@ trait Filter
      *
      * @return self
      */
-    public function addFilter(callable $callable)
+    public function addWhere(callable $callable)
     {
         $this->filter[] = $callable;
 
@@ -54,7 +54,7 @@ trait Filter
      *
      * @return self
      */
-    public function removeFilter(callable $callable)
+    public function removeWhere(callable $callable)
     {
         $res = array_search($callable, $this->filter, true);
         if (false !== $res) {
@@ -71,7 +71,7 @@ trait Filter
      *
      * @return boolean
      */
-    public function hasFilter(callable $callable)
+    public function hasWhere(callable $callable)
     {
         return false !== array_search($callable, $this->filter, true);
     }
@@ -81,7 +81,7 @@ trait Filter
      *
      * @return self
      */
-    public function clearFilter()
+    public function clearWhere()
     {
         $this->filter = [];
 
@@ -89,18 +89,18 @@ trait Filter
     }
 
     /**
-    * Filter the Iterator
+    * Where the Iterator
     *
     * @param \Iterator $iterator
     *
     * @return \Iterator
     */
-    protected function applyFilter(Iterator $iterator)
+    protected function applyWhere(Iterator $iterator)
     {
         foreach ($this->filter as $callable) {
             $iterator = new CallbackFilterIterator($iterator, $callable);
         }
-        $this->clearFilter();
+        $this->clearWhere();
 
         return $iterator;
     }

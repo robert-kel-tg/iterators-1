@@ -6,7 +6,7 @@ use FilterIterator;
 use Iterator;
 
 /**
- *  A simple MapIterator
+ * @codeCoverageIgnore
  */
 class HhvmCallbackFilterIterator extends FilterIterator
 {

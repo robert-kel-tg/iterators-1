@@ -3,7 +3,7 @@
 namespace P\IQuery;
 
 use Iterator;
-use P\IQuery\SQL\Filter;
+use P\IQuery\SQL\Where;
 use P\IQuery\SQL\SortBy;
 use P\IQuery\SQL\Interval;
 use P\IQuery\SQL\Select;
@@ -16,7 +16,7 @@ trait IQueryTrait
     /**
      *  Iterator Filtering Trait
      */
-    use Filter;
+    use Where;
 
     /**
      *  Iterator Sorting Trait
@@ -44,7 +44,7 @@ trait IQueryTrait
     public function query()
     {
         $iterator = $this->getIterator();
-        $iterator = $this->applyFilter($iterator);
+        $iterator = $this->applyWhere($iterator);
         $iterator = $this->applySortBy($iterator);
         $iterator = $this->applyInterval($iterator);
         $iterator = $this->applySelect($iterator);
