@@ -3,7 +3,9 @@ IQuery
 
 A simple library to query Iterator with a SQL-like syntax
 
-P\IQuery is a simple library to ease Iterator manipulation by query Iterator using SQL like syntax.
+`P\IQuery` is a simple library to ease Iterator manipulation by query Iterator using SQL like syntax.
+
+The library is an extract of the [League\csv](http://csv.thephpleague.com) library repacked to be used on any type of `Iterator` not just `SplFileObject` objects.
 
 This package is compliant with [PSR-1], [PSR-2], and [PSR-4].
 
@@ -25,13 +27,51 @@ Install the `IQuery` package with Composer.
 ```json
 {
     "require": {
-        "P/IQuery": "*"
+        "P\IQuery": "*"
     }
 }
 ```
+### Going Solo
 
-Documentation
--------------
+You can also use `P\IQuery` without using Composer by downloading the library and registing an autoloader function:
+
+```php
+spl_autoload_register(function ($class) {
+    $prefix = 'P\\IQuery\\';
+    $base_dir = __DIR__ . '/src/';
+    $len = strlen($prefix);
+    if (strncmp($prefix, $class, $len) !== 0) {
+        // no, move to the next registered autoloader
+        return;
+    }
+    $relative_class = substr($class, $len);
+    $file = $base_dir . str_replace('\\', '/', $relative_class) . '.php';
+    if (file_exists($file)) {
+        require $file;
+    }
+});
+```
+
+Or, use any other [PSR-4](http://www.php-fig.org/psr/psr-4/) compatible autoloader.
+
+## Tips
+
+This library does not work out of the box on **hhvm** the reason being that [CallbackFilterIterator](https://github.com/facebook/hhvm/issues/1715) is not yet implemented.
+
+But you can solve this problem using the following little snippet:
+
+
+```php
+
+if (! class_exists('CallbackFilterIterator') {
+    class_alias(
+    'P\IQuery\Iterator\HhvmCallbackFilterIterator',
+    'CallbackFilterIterator'
+    );
+}
+```
+
+Then everything should work as intended.
 
 ## Instantiation
 
@@ -50,11 +90,11 @@ The library ease the search by using a set of methods described below. But keep 
 * The query options methods can be call in any sort of order before any query execution;
 * After each execution, all settings are cleared;
 
-## Filtering methods
+### Filtering methods
 
 The filtering options **are the first settings applied to the Iterator before anything else**. The filters follow the *First In First Out* rule.
 
-### addFilter($callable)
+#### addFilter($callable)
 
 The `addFilter` method adds a callable filter function each time it is called. The function can take up to three parameters:
 
@@ -62,53 +102,53 @@ The `addFilter` method adds a callable filter function each time it is called. T
 * the current iterator key;
 * the iterator object;
 
-### removeFilter($callable)
+#### removeFilter($callable)
 
 `removeFilter` method removes an already registered filter function. If the function was registered multiple times, you will have to call `removeFilter` as often as the filter was registered. **The first registered copy will be the first to be removed.**
 
-### hasFilter($callable)
+#### hasFilter($callable)
 
 `hasFilter` method checks if the filter function is already registered
 
-### clearFilter()
+#### clearFilter()
 
 `clearFilter` method removes all registered filter functions.
 
-## Sorting methods
+### Sorting methods
 
 The sorting options are applied **after the filtering options**. The sorting follow the *First In First Out* rule.
 
 **To sort the data `iterator_to_array` is used which could lead to performance penalty if you have a heavy `iterator` to sort**
 
-### addSortBy($callable)
+#### addSortBy($callable)
 
-`addSortBy` method adds a sorting function each time it is called. The function takes exactly two parameters which will be filled by pairs of rows.
+`addSortBy` method adds a sorting function each time it is called. The function takes exactly two parameters which will be filled by pairs of consecutive items.
 
-### removeSortBy($callable)
+#### removeSortBy($callable)
 
 `removeSortBy` method removes an already registered sorting function. If the function was registered multiple times, you will have to call `removeSortBy` as often as the function was registered. **The first registered copy will be the first to be removed.**
 
-### hasSortBy($callable)
+#### hasSortBy($callable)
 
 `hasSortBy` method checks if the sorting function is already registered
 
-### clearSortBy()
+#### clearSortBy()
 
 `clearSortBy` method removes all registered sorting functions.
 
-## Interval methods
+### Interval methods
 
-The methods enable returning a specific interval of CSV rows. When called more than once, only the last filtering settings is taken into account. The interval is calculated **after filtering and/or sorting but before extracting the data**.
+The methods enable returning a specific interval of Iterator items. When called more than once, only the last filtering settings is taken into account. The interval is calculated **after filtering and/or sorting but before extracting the data**.
 
-### setOffset($offset = 0)
+#### setOffset($offset = 0)
 
 `setOffset` method specifies an optional offset for the return data. By default the offset equals `0`.
 
-### setLimit($limit = -1)
+#### setLimit($limit = -1)
 
-`setLimit` method specifies an optional maximum rows count for the return data. By default the offset equals `-1`, which translate to all rows.
+`setLimit` method specifies an optional maximum items to return. By default the offset equals `-1`, which translate to all items.
 
-## Select method
+### Select method
 
 The `select` method enable modifying the iterator content by specifying a callable function that will be applied on each iterator resulting items.
 
@@ -118,11 +158,11 @@ The method can take up to three parameters:
 * the current iterator key;
 * the iterator object;
 
-### query()
+#### query()
 
 The `query` method prepares and issues queries on the Iterator. It returns an `Iterator` that represents the result that you can further manipulate as you wish.
 
-## A concrete example to sum it all
+### A concrete example to sum it all
 
 Here's an example on how to use the query features of the `IQuery` class:
 
