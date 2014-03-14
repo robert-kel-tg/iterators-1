@@ -1,6 +1,8 @@
 IQuery
 ======
 
+[![Build Status](https://travis-ci.org/nyamsprod/IQuery.png)](https://travis-ci.org/nyamsprod/IQuery)
+
 A simple library to query Iterator with a SQL-like syntax
 
 `P\IQuery` is a simple library to ease Iterator manipulation by query Iterator using SQL like syntax.
