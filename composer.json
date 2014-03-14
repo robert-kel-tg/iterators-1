@@ -1,0 +1,31 @@
+{
+    "name": "P/IQuery",
+    "type": "library",
+    "description" : "SQL for iterator",
+    "keywords": ["Structure", "Query", "Iterator"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name" : "Ignace Nyamagana Butera",
+            "email" : "nyamsprod@gmail.com",
+            "homepage" : "https://github.com/nyamsprod/",
+            "role" : "Developer"
+        }
+    ],
+    "require": {
+        "php" : ">=5.4.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit" : "*"
+    },    
+    "autoload": {
+        "psr-4": {
+            "P\\IQuery\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "P\\IQuery\\Test\\": "test"
+        }
+    }
+}
