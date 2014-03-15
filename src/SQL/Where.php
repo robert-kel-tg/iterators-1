@@ -3,6 +3,7 @@
 namespace P\IQuery\SQL;
 
 use CallbackFilterIterator;
+use RecursiveCallbackFilterIterator;
 use Iterator;
 
 /**
