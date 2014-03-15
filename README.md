@@ -60,19 +60,6 @@ Or, use any other [PSR-4](http://www.php-fig.org/psr/psr-4/) compatible autoload
 
 This library does not work out of the box on **hhvm** the reason being that [CallbackFilterIterator](https://github.com/facebook/hhvm/issues/1715) is not yet implemented.
 
-But you can solve this problem using the following little snippet:
-
-
-```php
-
-if (! class_exists('CallbackFilterIterator') {
-    class_alias(
-    'P\IQuery\Iterator\HhvmCallbackFilterIterator',
-    'CallbackFilterIterator'
-    );
-}
-```
-
 Then everything should work as intended.
 
 ## Instantiation
@@ -95,26 +82,27 @@ The library ease the search by using a set of methods described below. But keep 
 ### Filtering methods
 
 The filtering options **are the first settings applied to the Iterator before anything else**. The filters follow the *First In First Out* rule.
+To enable filtering RecursiveIterator a optional argument $is_recursive is to be use to indicate which class is being used (ie: [CallbackFilterIterator](http://php.net/class.callbackfilteriterator.php) or [RecursiveCallbackFilterIterator](http://php.net/class.recursivecallbackfilteriterator.php)).
 
-#### addWhere($callable)
+#### addWhere($callable, $is_recursive = false)
 
-The `addFilter` method adds a callable filter function each time it is called. The function can take up to three parameters:
+The `addWhere` method adds a callable filter function each time it is called. The function can take up to three parameters:
 
 * the current iterator data;
 * the current iterator key;
 * the iterator object;
 
-#### removeWhere($callable)
+#### removeWhere($callable, $is_recursive = false)
 
-`removeFilter` method removes an already registered filter function. If the function was registered multiple times, you will have to call `removeFilter` as often as the filter was registered. **The first registered copy will be the first to be removed.**
+`removeWhere` method removes an already registered filter function. If the function was registered multiple times, you will have to call `removeWhere` as often as the filter was registered. **The first registered copy will be the first to be removed.**
 
-#### hasWhere($callable)
+#### hasWhere($callable, $is_recursive = false)
 
-`hasFilter` method checks if the filter function is already registered
+`hasWhere` method checks if the filter function is already registered
 
 #### clearWhere()
 
-`clearFilter` method removes all registered filter functions.
+`clearWhere` method removes all registered filter functions.
 
 ### Sorting methods
 

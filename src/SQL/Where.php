@@ -20,29 +20,14 @@ trait Where
     /**
      * Set the Iterator filter method
      *
-     * DEPRECATION WARNING! This method will be removed in the next major point release
-     *
-     * @deprecated deprecated since version 5.1
-     *
-     * @param callable $callable
-     *
-     * @return self
-     */
-    public function setWhere(callable $callable)
-    {
-        return $this->addWhere($callable);
-    }
-
-    /**
-     * Set the Iterator filter method
-     *
      * @param callable $filter
      *
      * @return self
      */
-    public function addWhere(callable $callable)
+    public function addWhere(callable $callable, $is_recursive = false)
     {
-        $this->filter[] = $callable;
+        $is_recursive = filter_var($is_recursive, FILTER_VALIDATE_BOOLEAN);
+        $this->filter[] = [$is_recursive, $callable];
 
         return $this;
     }
@@ -54,9 +39,10 @@ trait Where
      *
      * @return self
      */
-    public function removeWhere(callable $callable)
+    public function removeWhere(callable $callable, $is_recursive = false)
     {
-        $res = array_search($callable, $this->filter, true);
+        $is_recursive = filter_var($is_recursive, FILTER_VALIDATE_BOOLEAN);
+        $res = array_search([$is_recursive, $callable], $this->filter, true);
         if (false !== $res) {
             unset($this->filter[$res]);
         }
@@ -71,9 +57,10 @@ trait Where
      *
      * @return boolean
      */
-    public function hasWhere(callable $callable)
+    public function hasWhere(callable $callable, $is_recursive = false)
     {
-        return false !== array_search($callable, $this->filter, true);
+        $is_recursive = filter_var($is_recursive, FILTER_VALIDATE_BOOLEAN);
+        return false !== array_search([$is_recursive, $callable], $this->filter, true);
     }
 
     /**
@@ -97,8 +84,12 @@ trait Where
     */
     protected function applyWhere(Iterator $iterator)
     {
-        foreach ($this->filter as $callable) {
-            $iterator = new CallbackFilterIterator($iterator, $callable);
+        foreach ($this->filter as $where) {
+            $filter = 'CallbackFilterIterator';
+            if ($where[0]) {
+                $filter = 'RecursiveCallbackFilterIterator '; 
+            }
+            $iterator = new $filter($iterator, $callable);
         }
         $this->clearWhere();
 
