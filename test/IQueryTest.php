@@ -70,7 +70,7 @@ class IQueryTest extends PHPUnit_Framework_TestCase
         $func = function ($row) {
             return false !== strpos($row, 'o');
         };
-        $this->stmt->setWhere($func);
+        $this->stmt->addWhere($func);
 
         $iterator =$this->stmt->queryIterator();
         $this->assertCount(2, iterator_to_array($iterator, false));
@@ -96,7 +96,7 @@ class IQueryTest extends PHPUnit_Framework_TestCase
 
     public function testSortBy()
     {
-        $this->stmt->setSortBy('strcmp');
+        $this->stmt->addSortBy('strcmp');
         $iterator = $this->stmt->queryIterator();
         $res = iterator_to_array($iterator, false);
         $this->assertSame(['bar', 'foo', 'jane', 'john'], $res);
