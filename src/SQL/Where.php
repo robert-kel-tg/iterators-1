@@ -88,7 +88,7 @@ trait Where
             list($is_recursive, $callable) = $where;
             $filter = 'CallbackFilterIterator';
             if ($is_recursive) {
-                $filter = 'RecursiveCallbackFilterIterator '; 
+                $filter = 'RecursiveCallbackFilterIterator';
             }
             $iterator = new $filter($iterator, $callable);
         }
