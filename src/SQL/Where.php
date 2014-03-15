@@ -85,8 +85,9 @@ trait Where
     protected function applyWhere(Iterator $iterator)
     {
         foreach ($this->filter as $where) {
+            list($is_recursive, $callable) = $where;
             $filter = 'CallbackFilterIterator';
-            if ($where[0]) {
+            if ($is_recursive) {
                 $filter = 'RecursiveCallbackFilterIterator '; 
             }
             $iterator = new $filter($iterator, $callable);
