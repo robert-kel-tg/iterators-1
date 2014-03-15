@@ -150,9 +150,9 @@ The methods enable returning a specific interval of Iterator items. When called 
 
 `setLimit` method specifies an optional maximum items to return. By default the offset equals `-1`, which translate to all items.
 
-### Select method
+### setSelect method
 
-The `select` method enable modifying the iterator content by specifying a callable function that will be applied on each iterator resulting items.
+The `setSelect` method enable modifying the iterator content by specifying a callable function that will be applied on each iterator resulting items.
 
 The method can take up to three parameters:
 
@@ -160,9 +160,9 @@ The method can take up to three parameters:
 * the current iterator key;
 * the iterator object;
 
-#### query()
+#### queryIterator()
 
-The `query` method prepares and issues queries on the Iterator. It returns an `Iterator` that represents the result that you can further manipulate as you wish.
+The `queryIterator` method prepares and issues queries on the Iterator. It returns an `Iterator` that represents the result that you can further manipulate as you wish.
 
 ### A concrete example to sum it all
 
@@ -194,7 +194,7 @@ $iterator = $stmt
     ->addSelect(function ($value) {
         return array_map('strtoupper', $value);
     })
-    ->query(); 
+    ->queryIterator(); 
 ```
 
 Testing

@@ -41,7 +41,7 @@ trait IQueryTrait
      *
      * @return Iterator
      */
-    public function query()
+    public function queryIterator()
     {
         $iterator = $this->getIterator();
         $iterator = $this->applyWhere($iterator);

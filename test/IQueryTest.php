@@ -26,7 +26,7 @@ class IQueryTest extends PHPUnit_Framework_TestCase
     public function testSetLimit()
     {
         $this->stmt->setLimit(1);
-        $iterator = $this->stmt->query();
+        $iterator = $this->stmt->queryIterator();
         $res = iterator_to_array($iterator);
         $this->assertCount(1, $res);
 
@@ -39,7 +39,7 @@ class IQueryTest extends PHPUnit_Framework_TestCase
     public function testSetOffset()
     {
         $this->stmt->setOffset(1);
-        $iterator = $this->stmt->query();
+        $iterator = $this->stmt->queryIterator();
         $res = iterator_to_array($iterator);
         $this->assertCount(3, $res);
 
@@ -50,7 +50,7 @@ class IQueryTest extends PHPUnit_Framework_TestCase
     {
         $this->stmt->setOffset(3);
         $this->stmt->setLimit(10);
-        $iterator = $this->stmt->query();
+        $iterator = $this->stmt->queryIterator();
         $res = iterator_to_array($iterator);
         $this->assertSame([3 => 'bar'], $res);
         $this->assertCount(1, $res);
@@ -60,7 +60,7 @@ class IQueryTest extends PHPUnit_Framework_TestCase
     {
         $this->stmt->setOffset(1);
         $this->stmt->setLimit(1);
-        $iterator = $this->stmt->query();
+        $iterator = $this->stmt->queryIterator();
         $res = iterator_to_array($iterator);
         $this->assertCount(1, $res);
     }
@@ -72,7 +72,7 @@ class IQueryTest extends PHPUnit_Framework_TestCase
         };
         $this->stmt->setWhere($func);
 
-        $iterator =$this->stmt->query();
+        $iterator =$this->stmt->queryIterator();
         $this->assertCount(2, iterator_to_array($iterator, false));
 
         $func2 = function ($row) {
@@ -81,7 +81,7 @@ class IQueryTest extends PHPUnit_Framework_TestCase
         $this->stmt->addWhere($func2);
         $this->stmt->addWhere($func);
 
-        $iterator = $this->stmt->query();
+        $iterator = $this->stmt->queryIterator();
         $this->assertCount(1, iterator_to_array($iterator, false));
 
         $this->stmt->addWhere($func2);
@@ -90,14 +90,14 @@ class IQueryTest extends PHPUnit_Framework_TestCase
         $this->stmt->removeWhere($func2);
         $this->assertFalse($this->stmt->hasWhere($func2));
 
-        $iterator = $this->stmt->query();
+        $iterator = $this->stmt->queryIterator();
         $this->assertCount(2, iterator_to_array($iterator, false));
     }
 
     public function testSortBy()
     {
         $this->stmt->setSortBy('strcmp');
-        $iterator = $this->stmt->query();
+        $iterator = $this->stmt->queryIterator();
         $res = iterator_to_array($iterator, false);
         $this->assertSame(['bar', 'foo', 'jane', 'john'], $res);
 
@@ -105,7 +105,7 @@ class IQueryTest extends PHPUnit_Framework_TestCase
         $this->stmt->addSortBy('strcmp');
         $this->stmt->removeSortBy('strcmp');
         $this->assertTrue($this->stmt->hasSortBy('strcmp'));
-        $iterator = $this->stmt->query();
+        $iterator = $this->stmt->queryIterator();
         $res = iterator_to_array($iterator, false);
         $this->assertSame(['bar', 'foo', 'jane', 'john'], $res);
     }
@@ -117,7 +117,7 @@ class IQueryTest extends PHPUnit_Framework_TestCase
         };
 
         $this->stmt->setSelect($func);
-        $iterator = $this->stmt->query();
+        $iterator = $this->stmt->queryIterator();
         $this->assertSame(array_map('strtoupper', $this->data), iterator_to_array($iterator));
     }
 }
