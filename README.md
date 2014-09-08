@@ -9,9 +9,8 @@ A simple library to query Iterator with a SQL-like syntax
 
 The library is an extract of the [League\csv](http://csv.thephpleague.com) library repacked to be used on any type of `Iterator` not just `SplFileObject` objects.
 
-This package is compliant with [PSR-1], [PSR-2], and [PSR-4].
+This package is compliant with [PSR-2], and [PSR-4].
 
-[PSR-1]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-1-basic-coding-standard.md
 [PSR-2]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md
 [PSR-4]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-4-autoloader.md
 
@@ -19,7 +18,7 @@ This package is compliant with [PSR-1], [PSR-2], and [PSR-4].
 System Requirements
 -------
 
-You need **PHP >= 5.4.0** to use `P\IQuery` but the latest stable version of PHP is recommended.
+You need **PHP >= 5.4.0** or **HHVM >= 3.2.0** to use `P\IQuery` but the latest stable version of PHP is recommended.
 
 Install
 -------
@@ -56,18 +55,12 @@ spl_autoload_register(function ($class) {
 
 Or, use any other [PSR-4](http://www.php-fig.org/psr/psr-4/) compatible autoloader.
 
-## Tips
-
-This library does not work out of the box on **hhvm** the reason being that [CallbackFilterIterator](https://github.com/facebook/hhvm/issues/1715) is not yet implemented.
-
-Then everything should work as intended.
-
 ## Instantiation
 
 You can use the library in two way.
 
-* You can use the trait `IQueryTrait` on any class that implements the `IteratorAggregate` interface
-* You can instantiate a the `IQuery` class with an Iterator object.
+* You can use the trait `IteratorQueryBuilder` on any class that implements the `IteratorAggregate` interface
+* You can instantiate a the `QueryIterator` class with an Iterator object.
 
 In both case you will end up with the ability to traverse your Iterator using a SQL-like method. 
 
@@ -78,13 +71,13 @@ The library ease the search by using a set of methods described below. But keep 
 * The query options methods are all chainable *except when they have to return a boolean*;
 * The query options methods can be call in any sort of order before any query execution;
 * After each execution, all settings are cleared;
+* All options follow the the *First In First Out* rule.
 
-### Filtering methods
+### Where methods
 
-The filtering options **are the first settings applied to the Iterator before anything else**. The filters follow the *First In First Out* rule.
-To enable filtering RecursiveIterator a optional argument $is_recursive is to be use to indicate which class is being used (ie: [CallbackFilterIterator](http://php.net/class.callbackfilteriterator.php) or [RecursiveCallbackFilterIterator](http://php.net/class.recursivecallbackfilteriterator.php)).
+The where options **are the first settings applied to the Iterator before anything else**. 
 
-#### addWhere($callable, $is_recursive = false)
+#### addWhere($callable)
 
 The `addWhere` method adds a callable filter function each time it is called. The function can take up to three parameters:
 
@@ -92,11 +85,11 @@ The `addWhere` method adds a callable filter function each time it is called. Th
 * the current iterator key;
 * the iterator object;
 
-#### removeWhere($callable, $is_recursive = false)
+#### removeWhere($callable)
 
 `removeWhere` method removes an already registered filter function. If the function was registered multiple times, you will have to call `removeWhere` as often as the filter was registered. **The first registered copy will be the first to be removed.**
 
-#### hasWhere($callable, $is_recursive = false)
+#### hasWhere($callable)
 
 `hasWhere` method checks if the filter function is already registered
 
@@ -104,27 +97,27 @@ The `addWhere` method adds a callable filter function each time it is called. Th
 
 `clearWhere` method removes all registered filter functions.
 
-### Sorting methods
+### Order By methods
 
-The sorting options are applied **after the filtering options**. The sorting follow the *First In First Out* rule.
+The sorting options are applied **after the where options**.
 
 **To sort the data `iterator_to_array` is used which could lead to performance penalty if you have a heavy `iterator` to sort**
 
-#### addSortBy($callable)
+#### addOrderBy($callable)
 
-`addSortBy` method adds a sorting function each time it is called. The function takes exactly two parameters which will be filled by pairs of consecutive items.
+`addOrderBy` method adds a sorting function each time it is called. The function takes exactly two parameters which will be filled by pairs of consecutive items in your iterator.
 
-#### removeSortBy($callable)
+#### removeOrderBy($callable)
 
-`removeSortBy` method removes an already registered sorting function. If the function was registered multiple times, you will have to call `removeSortBy` as often as the function was registered. **The first registered copy will be the first to be removed.**
+`removeOrderBy` method removes an already registered sorting function. If the function was registered multiple times, you will have to call `removeOrderBy` as often as the function was registered. **The first registered copy will be the first to be removed.**
 
-#### hasSortBy($callable)
+#### hasOrderBy($callable)
 
-`hasSortBy` method checks if the sorting function is already registered
+`hasOrderBy` method checks if the sorting function is already registered
 
-#### clearSortBy()
+#### clearOrderBy()
 
-`clearSortBy` method removes all registered sorting functions.
+`clearOrderBy` method removes all registered sorting functions.
 
 ### Interval methods
 
@@ -170,19 +163,88 @@ function sortByLastName($rowA, $rowB)
     return strcmp($rowB[1], $rowA[1]);
 }
 
+$file = new SplFileObject('/path/to/my/csv/file.txt');
+$file->setFlags(SplFileObject::DROP_NEW_LINE);
+
+$stmt = new P\IQuery($file);
+$iterator = $stmt
+    ->setOffset(3)
+    ->setLimit(2)
+    ->queryIterator(); 
+//iterator is a Iterator object which contains at most
+// 2 items starting from the 4 line of the file
+
+```
+
+## Fetching Iterator Data
+
+In addition to the QueryIterator() method you can retrieve specific items from your iterator using the following 2 methods.
+
+- `fetchAll` will return a sequential array of the found items;
+- `fetchOne` will return a single item from the array; *Of note: the Interval methods have no effect on the output of the method;
+
+```php
+
+use P\IQuery;
+
+function filterByEmail($row) 
+{
+    return filer_var($row[2], FILTER_VALIDATE_EMAIL);
+}
+
+function sortByLastName($rowA, $rowB)
+{
+    return strcmp($rowB[1], $rowA[1]);
+}
+
+$file = new SplFileObject('/path/to/my/csv/file.txt');
+$file->setFlags(SplFileObject::DROP_NEW_LINE);
+
+$stmt = new P\IQuery($file);
+$res = $stmt
+    ->setOffset(3)
+    ->setLimit(2)
+    ->addSelect(function ($value) {
+        return strtoupper($value);
+    })
+    ->fetchAll(); 
+// $res is a array containing each line of the 
+// file is carry the same result as using php file function
+```
+
+Last but not least, you can iterate over the Iterator and apply a callable to each found item using the `each` method. *This can be handy if you want for instance import data from your Iterator to a database for example.*
+
+```php
+
+use P\IQuery;
+
+function filterByEmail($row) 
+{
+    return filer_var($row[2], FILTER_VALIDATE_EMAIL);
+}
+
+function sortByLastName($rowA, $rowB)
+{
+    return strcmp($rowB[1], $rowA[1]);
+}
+
 $csv = new SplFileObject('/path/to/my/csv/file.csv');
 $csv->setFlags(SplFileObject::READ_CSV|SplFileObject::DROP_NEW_LINE);
 
 $stmt = new P\IQuery($csv);
-$iterator = $stmt
+$nbIterations = $stmt
     ->setOffset(3)
     ->setLimit(2)
     ->addWhere('filterByEmail')
-    ->addSortBy('sortByLastName')
+    ->addOrderBy('sortByLastName')
     ->addSelect(function ($value) {
-        return array_map('strtoupper', $value);
+        return strtoupper($value);
     })
-    ->queryIterator(); 
+    ->each(function ($row, $index, $iterator) use (&$res, $func)) {
+        $res[] = $func($row, $index, $iterator);
+        return true;
+    }); 
+// $nbIterations is the number of successfull iterations
 ```
 
 Testing

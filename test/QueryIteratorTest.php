@@ -4,20 +4,19 @@ namespace P\IQuery\test;
 
 use ArrayIterator;
 use PHPUnit_Framework_TestCase;
-use P\IQuery\IQuery;
+use P\IQuery\QueryIterator;
 
 /**
  * @group iterator
  */
-class IQueryTest extends PHPUnit_Framework_TestCase
+class QueryIteratorTest extends PHPUnit_Framework_TestCase
 {
     private $stmt;
-    private $iterator;
     private $data = ['john', 'jane', 'foo', 'bar'];
 
     public function setUp()
     {
-        $this->stmt = new Iquery(new ArrayIterator($this->data));
+        $this->stmt = new QueryIterator(new ArrayIterator($this->data));
     }
 
     /**
@@ -94,17 +93,17 @@ class IQueryTest extends PHPUnit_Framework_TestCase
         $this->assertCount(2, iterator_to_array($iterator, false));
     }
 
-    public function testSortBy()
+    public function testOrderBy()
     {
-        $this->stmt->addSortBy('strcmp');
+        $this->stmt->addOrderBy('strcmp');
         $iterator = $this->stmt->queryIterator();
         $res = iterator_to_array($iterator, false);
         $this->assertSame(['bar', 'foo', 'jane', 'john'], $res);
 
-        $this->stmt->addSortBy('strcmp');
-        $this->stmt->addSortBy('strcmp');
-        $this->stmt->removeSortBy('strcmp');
-        $this->assertTrue($this->stmt->hasSortBy('strcmp'));
+        $this->stmt->addOrderBy('strcmp');
+        $this->stmt->addOrderBy('strcmp');
+        $this->stmt->removeOrderBy('strcmp');
+        $this->assertTrue($this->stmt->hasOrderBy('strcmp'));
         $iterator = $this->stmt->queryIterator();
         $res = iterator_to_array($iterator, false);
         $this->assertSame(['bar', 'foo', 'jane', 'john'], $res);
@@ -119,5 +118,65 @@ class IQueryTest extends PHPUnit_Framework_TestCase
         $this->stmt->setSelect($func);
         $iterator = $this->stmt->queryIterator();
         $this->assertSame(array_map('strtoupper', $this->data), iterator_to_array($iterator));
+    }
+
+    public function testSelectWhenCleared()
+    {
+        $func = function ($value) {
+            return strtoupper($value);
+        };
+
+        $this->stmt->setSelect($func);
+        $this->stmt->clearSelect();
+        $iterator = $this->stmt->queryIterator();
+        $this->assertSame($this->data, iterator_to_array($iterator));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testFetchOne()
+    {
+        $func = function ($value) {
+            return strtoupper($value);
+        };
+
+        $this->stmt->setSelect($func);
+        $item = $this->stmt->fetchOne();
+        $this->assertSame('JOHN', $item);
+
+        $this->stmt->setSelect($func);
+        $this->stmt->fetchOne(-3);
+    }
+
+    public function testFetchAll()
+    {
+        $func = function ($value) {
+            return strtoupper($value);
+        };
+
+        $this->stmt->setSelect($func);
+        $res = $this->stmt->fetchAll();
+        $this->assertSame(array_values(array_map('strtoupper', $this->data)), $res);
+    }
+
+    public function testEach()
+    {
+        $transform = [];
+        $res = $this->stmt->each(function ($row) use (&$transform) {
+            $transform[] = strtoupper($row);
+
+            return true;
+        });
+        $this->assertSame($res, 4);
+        $this->assertSame(strtoupper($this->data[0]), $transform[0]);
+        $res = $this->stmt->each(function ($row, $index) {
+            if ($index > 0) {
+                return false;
+            }
+
+            return true;
+        });
+        $this->assertSame($res, 1);
     }
 }
