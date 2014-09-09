@@ -1,19 +1,16 @@
 Iterators
 ======
 
-[![Build Status](https://travis-ci.org/nyamsprod/Iterators.png)](https://travis-ci.org/nyamsprod/Iterators)
+[![Build Status](https://travis-ci.org/nyamsprod/IQuery.png)](https://travis-ci.org/nyamsprod/IQuery)
 
-A simple library to query Iterator with a SQL-like syntax
+`P\Iterators` adds two new Iterators classes `MapIteraor` and `QueryIterator` to your project.
 
-`P\Iterators` is a simple library to ease Iterator manipulation by query Iterator using SQL like syntax.
-
-The library is an extract of the [League\csv](http://csv.thephpleague.com) library repacked to be used on any type of `Iterator` not just `SplFileObject` objects.
+*The library is an extract of the [League\csv](http://csv.thephpleague.com) library repacked to be used on any type of `Iterator` not just `SplFileObject` objects used to treat CSV files.*
 
 This package is compliant with [PSR-2], and [PSR-4].
 
 [PSR-2]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md
 [PSR-4]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-4-autoloader.md
-
 
 System Requirements
 -------
@@ -55,19 +52,15 @@ spl_autoload_register(function ($class) {
 
 Or, use any other [PSR-4](http://www.php-fig.org/psr/psr-4/) compatible autoloader.
 
-## Instantiation
-
-This package adds two new Iterator Class `MapIteraor` and `QueryIterator`.
-
 ## MapIterator
 
-This class enable applying a callable function on each Iterator item. The callable signature is :
+`MapIterator` extends the SPL `IteratorIterator` class. This class enables applying a callable function on each Iterator item. The callable function can take up to three parameters:
 
-- the current item value;
-- the current item index;
-- the given iterator;
+* the current iterator data;
+* the current iterator key;
+* the iterator object;
 
-`MapIterator` extends the SPL `IteratorIterator` class.
+Here's a simple usage:
 
 ```php
 use P\Iterators;
@@ -86,7 +79,7 @@ var_dump(iterator_to_array($iterator));
 
 ## QueryIterator
 
-This class enable seeking data into an Iterator using a SQL like approach. You instantiate a the `QueryIterator` class with an Iterator object. The `QueryIterator` class extends the `IteratorAggregate` class.
+This class enable seeking data into an Iterator using a SQL like approach. You instantiate a the `QueryIterator` class with an Iterator object. The `QueryIterator` class implements the `IteratorAggregate` interface.
 
 The class uses a set of methods described below. But keep in mind that:
 
@@ -153,7 +146,9 @@ The methods enable returning a specific interval of Iterator items. When called 
 
 `setLimit` method specifies an optional maximum items to return. By default the offset equals `-1`, which translate to all items.
 
-### setSelect method
+## Select method
+
+### setSelect($callable)
 
 The `setSelect` method enable modifying the iterator content by specifying a callable function that will be applied on each iterator resulting items.
 
@@ -163,27 +158,41 @@ The method can take up to three parameters:
 * the current iterator key;
 * the iterator object;
 
-#### query()
+## Query the Iterator
 
-The `query` method prepares and issues queries on the Iterator. It returns an `Iterator` that represents the result that you can further manipulate as you wish.
+### query()
 
-### A concrete example to sum it all
+The `query` method prepares and issues queries on the Iterator. The result returned is an `Iterator` that you can further manipulate as you wish.
+
+### fetchAll()
+
+The `fetchAll` method prepares and issues queries on the Iterator. But instead of returning an `Iterator` it returns a sequential array of the found items;
+
+### fetchOne()
+
+The `fetchOne` method returns a single item from the Iterator; *Of note: the Interval methods have no effect on the output of this method;
+
+### each()
+
+The `each` method allows you to iterate over the given Iterator and execute a callable function with each selected item. 
+
+The callable function can take up to three parameters:
+
+* the current iterator data;
+* the current iterator key;
+* the iterator object; 
+
+The callable function **MUST** return `true` in order to continue to iterate over the Iterator object.
+
+The method returns the number of iterations. 
+
+## Examples
 
 Here's an example on how to use the query features of the `Iterators` class:
 
 ```php
 
 use P\Iterators;
-
-function filterByEmail($row) 
-{
-    return filer_var($row[2], FILTER_VALIDATE_EMAIL);
-}
-
-function sortByLastName($rowA, $rowB)
-{
-    return strcmp($rowB[1], $rowA[1]);
-}
 
 $file = new SplFileObject('/path/to/my/csv/file.txt');
 $file->setFlags(SplFileObject::DROP_NEW_LINE);
@@ -195,15 +204,14 @@ $iterator = $stmt
     ->query(); 
 //iterator is a Iterator object which contains at most
 // 2 items starting from the 4 line of the file
+//you can iterate over the $iterator using the foreach construct
 
+foreach ($iterator as $line) {
+    echo $line; //the selected line from the file
+}
 ```
 
-## Fetching Iterator Data
-
-In addition to the `query` method you can retrieve specific items from your iterator using the following 2 methods.
-
-- `fetchAll` will return a sequential array of the found items;
-- `fetchOne` will return a single item from the array; *Of note: the Interval methods have no effect on the output of the method;
+Here's another example using the `fetchAll` method
 
 ```php
 
@@ -224,7 +232,7 @@ $res = $stmt
 // file is carry the same result as using php file function
 ```
 
-Last but not least, you can iterate over the Iterator and apply a callable to each found item using the `each` method. *This can be handy if you want for instance import data from your Iterator to a database for example.*
+Using the `each` method
 
 ```php
 
@@ -257,6 +265,7 @@ $nbIterations = $stmt
         return true;
     }); 
 // $nbIterations is the number of successfull iterations
+// $res array contains the result of applying the $func function to the values
 ```
 
 Testing

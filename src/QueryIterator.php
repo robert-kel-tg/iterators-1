@@ -39,8 +39,8 @@ class QueryIterator implements IteratorAggregate
     /**
      * The Constructor
      *
-     * @param Traversable $iterator
-     * @param callable    $callable
+     * @param \Iterator $iterator
+     * @param callable  $callable
      */
     public function __construct(Iterator $iterator)
     {
