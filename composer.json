@@ -20,12 +20,12 @@
     },    
     "autoload": {
         "psr-4": {
-            "P\\IQuery\\": "src"
+            "P\\Iterators\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "P\\IQuery\\Test\\": "test"
+            "P\\Iterators\\Test\\": "test"
         }
     }
 }

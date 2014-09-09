@@ -1,11 +1,11 @@
-IQuery
+Iterators
 ======
 
-[![Build Status](https://travis-ci.org/nyamsprod/IQuery.png)](https://travis-ci.org/nyamsprod/IQuery)
+[![Build Status](https://travis-ci.org/nyamsprod/Iterators.png)](https://travis-ci.org/nyamsprod/Iterators)
 
 A simple library to query Iterator with a SQL-like syntax
 
-`P\IQuery` is a simple library to ease Iterator manipulation by query Iterator using SQL like syntax.
+`P\Iterators` is a simple library to ease Iterator manipulation by query Iterator using SQL like syntax.
 
 The library is an extract of the [League\csv](http://csv.thephpleague.com) library repacked to be used on any type of `Iterator` not just `SplFileObject` objects.
 
@@ -18,27 +18,27 @@ This package is compliant with [PSR-2], and [PSR-4].
 System Requirements
 -------
 
-You need **PHP >= 5.4.0** or **HHVM >= 3.2.0** to use `P\IQuery` but the latest stable version of PHP is recommended.
+You need **PHP >= 5.4.0** or **HHVM >= 3.2.0** to use `P\Iterators` but the latest stable version of PHP is recommended.
 
 Install
 -------
 
-Install the `IQuery` package with Composer.
+Install the `Iterators` package with Composer.
 
 ```json
 {
     "require": {
-        "P\IQuery": "*"
+        "P\Iterators": "*"
     }
 }
 ```
 ### Going Solo
 
-You can also use `P\IQuery` without using Composer by downloading the library and registing an autoloader function:
+You can also use `P\Iterators` without using Composer by downloading the library and registing an autoloader function:
 
 ```php
 spl_autoload_register(function ($class) {
-    $prefix = 'P\\IQuery\\';
+    $prefix = 'P\\Iterators\\';
     $base_dir = __DIR__ . '/src/';
     $len = strlen($prefix);
     if (strncmp($prefix, $class, $len) !== 0) {
@@ -57,16 +57,38 @@ Or, use any other [PSR-4](http://www.php-fig.org/psr/psr-4/) compatible autoload
 
 ## Instantiation
 
-You can use the library in two way.
+This package adds two new Iterator Class `MapIteraor` and `QueryIterator`.
 
-* You can use the trait `IteratorQueryBuilder` on any class that implements the `IteratorAggregate` interface
-* You can instantiate a the `QueryIterator` class with an Iterator object.
+## MapIterator
 
-In both case you will end up with the ability to traverse your Iterator using a SQL-like method. 
+This class enable applying a callable function on each Iterator item. The callable signature is :
 
-## Querying the Iterator
+- the current item value;
+- the current item index;
+- the given iterator;
 
-The library ease the search by using a set of methods described below. But keep in mind that:
+`MapIterator` extends the SPL `IteratorIterator` class.
+
+```php
+use P\Iterators;
+
+$callable = function ($item) {
+    return strtoupper($item);
+}
+
+$iterator = new \ArrayIterator(['one', 'two', 'three', 'four']);
+$iterator = new MapIterator($iterator, $callable);
+
+var_dump(iterator_to_array($iterator));
+// will output something like ['ONE', 'TWO', 'THREE', 'FOUR'];
+
+```
+
+## QueryIterator
+
+This class enable seeking data into an Iterator using a SQL like approach. You instantiate a the `QueryIterator` class with an Iterator object. The `QueryIterator` class extends the `IteratorAggregate` class.
+
+The class uses a set of methods described below. But keep in mind that:
 
 * The query options methods are all chainable *except when they have to return a boolean*;
 * The query options methods can be call in any sort of order before any query execution;
@@ -141,17 +163,17 @@ The method can take up to three parameters:
 * the current iterator key;
 * the iterator object;
 
-#### queryIterator()
+#### query()
 
-The `queryIterator` method prepares and issues queries on the Iterator. It returns an `Iterator` that represents the result that you can further manipulate as you wish.
+The `query` method prepares and issues queries on the Iterator. It returns an `Iterator` that represents the result that you can further manipulate as you wish.
 
 ### A concrete example to sum it all
 
-Here's an example on how to use the query features of the `IQuery` class:
+Here's an example on how to use the query features of the `Iterators` class:
 
 ```php
 
-use P\IQuery;
+use P\Iterators;
 
 function filterByEmail($row) 
 {
@@ -166,11 +188,11 @@ function sortByLastName($rowA, $rowB)
 $file = new SplFileObject('/path/to/my/csv/file.txt');
 $file->setFlags(SplFileObject::DROP_NEW_LINE);
 
-$stmt = new P\IQuery($file);
+$stmt = new P\Iterators($file);
 $iterator = $stmt
     ->setOffset(3)
     ->setLimit(2)
-    ->queryIterator(); 
+    ->query(); 
 //iterator is a Iterator object which contains at most
 // 2 items starting from the 4 line of the file
 
@@ -178,29 +200,19 @@ $iterator = $stmt
 
 ## Fetching Iterator Data
 
-In addition to the QueryIterator() method you can retrieve specific items from your iterator using the following 2 methods.
+In addition to the `query` method you can retrieve specific items from your iterator using the following 2 methods.
 
 - `fetchAll` will return a sequential array of the found items;
 - `fetchOne` will return a single item from the array; *Of note: the Interval methods have no effect on the output of the method;
 
 ```php
 
-use P\IQuery;
-
-function filterByEmail($row) 
-{
-    return filer_var($row[2], FILTER_VALIDATE_EMAIL);
-}
-
-function sortByLastName($rowA, $rowB)
-{
-    return strcmp($rowB[1], $rowA[1]);
-}
+use P\Iterators;
 
 $file = new SplFileObject('/path/to/my/csv/file.txt');
 $file->setFlags(SplFileObject::DROP_NEW_LINE);
 
-$stmt = new P\IQuery($file);
+$stmt = new P\Iterators($file);
 $res = $stmt
     ->setOffset(3)
     ->setLimit(2)
@@ -216,7 +228,7 @@ Last but not least, you can iterate over the Iterator and apply a callable to ea
 
 ```php
 
-use P\IQuery;
+use P\Iterators;
 
 function filterByEmail($row) 
 {
@@ -231,7 +243,7 @@ function sortByLastName($rowA, $rowB)
 $csv = new SplFileObject('/path/to/my/csv/file.csv');
 $csv->setFlags(SplFileObject::READ_CSV|SplFileObject::DROP_NEW_LINE);
 
-$stmt = new P\IQuery($csv);
+$stmt = new P\Iterators($csv);
 $nbIterations = $stmt
     ->setOffset(3)
     ->setLimit(2)
@@ -263,4 +275,4 @@ Credits
 -------
 
 - [ignace nyamagana butera](https://github.com/nyamsprod)
-- [All Contributors](https://github.com/nyamsprod/IQuery/graphs/contributors)
+- [All Contributors](https://github.com/nyamsprod/Iterators/graphs/contributors)

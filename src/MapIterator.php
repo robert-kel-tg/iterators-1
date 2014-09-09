@@ -1,16 +1,16 @@
 <?php
 /**
-* This file is part of the P\IQuery library
+* This file is part of the P\Iterator library
 *
 * @license http://opensource.org/licenses/MIT
-* @link https://github.com/nyamsprod/IQuery/
+* @link https://github.com/nyamsprod/Iterator/
 * @version 0.2.0
 * @package League.csv
 *
 * For the full copyright and license information, please view the LICENSE
 * file that was distributed with this source code.
 */
-namespace P\IQuery;
+namespace P\Iterators;
 
 use IteratorIterator;
 use Traversable;
