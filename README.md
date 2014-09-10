@@ -54,7 +54,7 @@ Or, use any other [PSR-4](http://www.php-fig.org/psr/psr-4/) compatible autoload
 
 ## MapIterator
 
-`MapIterator` extends the SPL `IteratorIterator` class. This class enables applying a callable function on each Iterator item. The callable function can take up to three parameters:
+`MapIterator` extends the SPL `IteratorIterator` class. This class transforms an Iterator by applying a callable function on each iterator item. The callable function can take up to three parameters:
 
 * the current iterator data;
 * the current iterator key;
@@ -63,7 +63,7 @@ Or, use any other [PSR-4](http://www.php-fig.org/psr/psr-4/) compatible autoload
 Here's a simple usage:
 
 ```php
-use P\Iterators;
+use P\Iterators\MapIterator;
 
 $callable = function ($item) {
     return strtoupper($item);
@@ -164,7 +164,6 @@ The method can take up to three parameters:
 
 This methods clears all registered options at any given time prior to the query execution and reset them to their initial value.
 
-
 ## Query the Iterator
 
 ### query()
@@ -199,12 +198,12 @@ Here's an example on how to use the query features of the `Iterators` class:
 
 ```php
 
-use P\Iterators;
+use P\Iterators\QueryIterator;
 
-$file = new SplFileObject('/path/to/my/csv/file.txt');
-$file->setFlags(SplFileObject::DROP_NEW_LINE);
+$file = new \SplFileObject('/path/to/my/csv/file.txt');
+$file->setFlags(\SplFileObject::DROP_NEW_LINE);
 
-$stmt = new P\Iterators($file);
+$stmt = new QueryIterator($file);
 $iterator = $stmt
     ->setOffset(3)
     ->setLimit(2)
@@ -222,12 +221,12 @@ Here's another example using the `fetchAll` method
 
 ```php
 
-use P\Iterators;
+use P\Iterators\QueryIterator;
 
-$file = new SplFileObject('/path/to/my/csv/file.txt');
-$file->setFlags(SplFileObject::DROP_NEW_LINE);
+$file = new \SplFileObject('/path/to/my/csv/file.txt');
+$file->setFlags(\SplFileObject::DROP_NEW_LINE);
 
-$stmt = new P\Iterators($file);
+$stmt = new QueryIterator($file);
 $res = $stmt
     ->setOffset(3)
     ->setLimit(2)
@@ -243,7 +242,7 @@ Using the `each` method
 
 ```php
 
-use P\Iterators;
+use P\Iterators\QueryIterator;
 
 function filterByEmail($row) 
 {
@@ -255,10 +254,10 @@ function sortByLastName($rowA, $rowB)
     return strcmp($rowB[1], $rowA[1]);
 }
 
-$csv = new SplFileObject('/path/to/my/csv/file.csv');
-$csv->setFlags(SplFileObject::READ_CSV|SplFileObject::DROP_NEW_LINE);
+$csv = new \SplFileObject('/path/to/my/csv/file.csv');
+$csv->setFlags(\SplFileObject::READ_CSV|SplFileObject::DROP_NEW_LINE);
 
-$stmt = new P\Iterators($csv);
+$stmt = new QueryIterator($csv);
 $nbIterations = $stmt
     ->setOffset(3)
     ->setLimit(2)
