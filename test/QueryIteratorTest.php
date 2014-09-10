@@ -127,9 +127,27 @@ class QueryIteratorTest extends PHPUnit_Framework_TestCase
         };
 
         $this->stmt->setSelect($func);
-        $this->stmt->clearSelect();
+        $this->stmt->setSelect();
         $iterator = $this->stmt->query();
         $this->assertSame($this->data, iterator_to_array($iterator));
+    }
+
+    public function testClearAll()
+    {
+        $func = function ($value) {
+            return strtoupper($value);
+        };
+
+        $this->stmt->setSelect($func);
+        $this->stmt->addOrderBy('strcmp');
+        $func = function ($row) {
+            return false !== strpos($row, 'o');
+        };
+        $this->stmt->addWhere($func);
+        $this->stmt->setOffSet(10);
+        $this->stmt->setLimit(20);
+        $this->stmt->clear();
+        $this->assertSame($this->data, $this->stmt->fetchAll());
     }
 
     /**

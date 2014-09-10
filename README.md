@@ -88,11 +88,11 @@ The class uses a set of methods described below. But keep in mind that:
 * After each execution, all settings are cleared;
 * All options follow the the *First In First Out* rule.
 
-### Where methods
+### Filtering methods
 
-The where options **are the first settings applied to the Iterator before anything else**. 
+The filter options **are the first settings applied to the Iterator before anything else**. 
 
-#### addWhere($callable)
+#### addWhere(callable $callable)
 
 The `addWhere` method adds a callable filter function each time it is called. The function can take up to three parameters:
 
@@ -100,11 +100,11 @@ The `addWhere` method adds a callable filter function each time it is called. Th
 * the current iterator key;
 * the iterator object;
 
-#### removeWhere($callable)
+#### removeWhere(callable $callable)
 
 `removeWhere` method removes an already registered filter function. If the function was registered multiple times, you will have to call `removeWhere` as often as the filter was registered. **The first registered copy will be the first to be removed.**
 
-#### hasWhere($callable)
+#### hasWhere(callable $callable)
 
 `hasWhere` method checks if the filter function is already registered
 
@@ -112,21 +112,21 @@ The `addWhere` method adds a callable filter function each time it is called. Th
 
 `clearWhere` method removes all registered filter functions.
 
-### Order By methods
+### Sorting methods
 
 The sorting options are applied **after the where options**.
 
 **To sort the data `iterator_to_array` is used which could lead to performance penalty if you have a heavy `iterator` to sort**
 
-#### addOrderBy($callable)
+#### addOrderBy(callable $callable)
 
 `addOrderBy` method adds a sorting function each time it is called. The function takes exactly two parameters which will be filled by pairs of consecutive items in your iterator.
 
-#### removeOrderBy($callable)
+#### removeOrderBy(callable $callable)
 
 `removeOrderBy` method removes an already registered sorting function. If the function was registered multiple times, you will have to call `removeOrderBy` as often as the function was registered. **The first registered copy will be the first to be removed.**
 
-#### hasOrderBy($callable)
+#### hasOrderBy(callable $callable)
 
 `hasOrderBy` method checks if the sorting function is already registered
 
@@ -146,9 +146,9 @@ The methods enable returning a specific interval of Iterator items. When called 
 
 `setLimit` method specifies an optional maximum items to return. By default the offset equals `-1`, which translate to all items.
 
-## Select method
+### Selecting method
 
-### setSelect($callable)
+#### setSelect(callable $callable = null)
 
 The `setSelect` method enable modifying the iterator content by specifying a callable function that will be applied on each iterator resulting items.
 
@@ -158,21 +158,28 @@ The method can take up to three parameters:
 * the current iterator key;
 * the iterator object;
 
+### Clearing all the options
+
+#### clear()
+
+This methods clears all registered options at any given time prior to the query execution and reset them to their initial value.
+
+
 ## Query the Iterator
 
 ### query()
 
-The `query` method prepares and issues queries on the Iterator. The result returned is an `Iterator` that you can further manipulate as you wish.
+The `query` method applies the filtering options set on the `Iterator` object. The result returned is a `Iterator` object that you can further manipulate as you wish.
 
 ### fetchAll()
 
-The `fetchAll` method prepares and issues queries on the Iterator. But instead of returning an `Iterator` it returns a sequential array of the found items;
+The `fetchAll` behaves like the `query` method but instead of returning an `Iterator` it returns a sequential array of the found items;
 
 ### fetchOne()
 
-The `fetchOne` method returns a single item from the Iterator; *Of note: the Interval methods have no effect on the output of this method;
+The `fetchOne` method returns a single item from the Iterator; *Of note: the Interval methods have no effect on the output of this method*;
 
-### each()
+### each(callable $callable)
 
 The `each` method allows you to iterate over the given Iterator and execute a callable function with each selected item. 
 
@@ -182,9 +189,9 @@ The callable function can take up to three parameters:
 * the current iterator key;
 * the iterator object; 
 
-The callable function **MUST** return `true` in order to continue to iterate over the Iterator object.
+The callable function **MUST** return `true` in order to continue to iterate over the original object.
 
-The method returns the number of iterations. 
+The method returns the number of sucessfull iterations. 
 
 ## Examples
 
@@ -224,7 +231,7 @@ $stmt = new P\Iterators($file);
 $res = $stmt
     ->setOffset(3)
     ->setLimit(2)
-    ->addSelect(function ($value) {
+    ->setSelect(function ($value) {
         return strtoupper($value);
     })
     ->fetchAll(); 
@@ -257,7 +264,7 @@ $nbIterations = $stmt
     ->setLimit(2)
     ->addWhere('filterByEmail')
     ->addOrderBy('sortByLastName')
-    ->addSelect(function ($value) {
+    ->setSelect(function ($value) {
         return strtoupper($value);
     })
     ->each(function ($row, $index, $iterator) use (&$res, $func)) {

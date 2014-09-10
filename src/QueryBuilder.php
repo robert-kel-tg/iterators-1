@@ -314,6 +314,7 @@ trait QueryBuilder
             return $iterator;
         }
         $callable = $this->iterator_select;
+        $this->iterator_select = null;
 
         return new MapIterator($iterator, $callable);
     }
@@ -325,7 +326,7 @@ trait QueryBuilder
      *
      * @return self
      */
-    public function setSelect($callable)
+    public function setSelect(callable $callable = null)
     {
         $this->iterator_select = $callable;
 
@@ -333,12 +334,16 @@ trait QueryBuilder
     }
 
     /**
-     * Remove all registered callable filter
+     * Remove all registered options
      *
      * @return $this
      */
-    public function clearSelect()
+    public function clear()
     {
+        $this->clearWhere();
+        $this->clearOrderBy();
+        $this->iterator_limit  = -1;
+        $this->iterator_offset = 0;
         $this->iterator_select = null;
 
         return $this;
