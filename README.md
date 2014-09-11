@@ -85,7 +85,6 @@ The class uses a set of methods described below. But keep in mind that:
 
 * The query options methods are all chainable *except when they have to return a boolean*;
 * The query options methods can be call in any sort of order before any query execution;
-* After each execution, all settings are cleared;
 * All options follow the the *First In First Out* rule.
 
 ### Filtering methods
@@ -166,21 +165,13 @@ This methods clears all registered options at any given time prior to the query 
 
 ## Query the Iterator
 
-### query()
+### getIterator()
 
-The `query` method applies the filtering options set on the `Iterator` object. The result returned is a `Iterator` object that you can further manipulate as you wish.
-
-### fetchAll()
-
-The `fetchAll` behaves like the `query` method but instead of returning an `Iterator` it returns a sequential array of the found items;
-
-### fetchOne()
-
-The `fetchOne` method returns a single item from the Iterator; *Of note: the Interval methods have no effect on the output of this method*;
+The `getIterator` method applies the filtering options set on the `Iterator` object. The result returned is a `Iterator` object that you can further manipulate as you wish.
 
 ### each(callable $callable)
 
-The `each` method allows you to iterate over the given Iterator and execute a callable function with each selected item. 
+The `each` method allows you to iterate over the given Iterator and execute a callable function with each selected item.
 
 The callable function can take up to three parameters:
 
@@ -203,11 +194,10 @@ use P\Iterators\QueryIterator;
 $file = new \SplFileObject('/path/to/my/csv/file.txt');
 $file->setFlags(\SplFileObject::DROP_NEW_LINE);
 
-$stmt = new QueryIterator($file);
-$iterator = $stmt
-    ->setOffset(3)
-    ->setLimit(2)
-    ->query(); 
+$iterator = new QueryIterator($file);
+$iterator->setOffset(3);
+$iterator->setLimit(2);
+
 //iterator is a Iterator object which contains at most
 // 2 items starting from the 4 line of the file
 //you can iterate over the $iterator using the foreach construct
@@ -215,27 +205,6 @@ $iterator = $stmt
 foreach ($iterator as $line) {
     echo $line; //the selected line from the file
 }
-```
-
-Here's another example using the `fetchAll` method
-
-```php
-
-use P\Iterators\QueryIterator;
-
-$file = new \SplFileObject('/path/to/my/csv/file.txt');
-$file->setFlags(\SplFileObject::DROP_NEW_LINE);
-
-$stmt = new QueryIterator($file);
-$res = $stmt
-    ->setOffset(3)
-    ->setLimit(2)
-    ->setSelect(function ($value) {
-        return strtoupper($value);
-    })
-    ->fetchAll(); 
-// $res is a array containing each line of the 
-// file is carry the same result as using php file function
 ```
 
 Using the `each` method
@@ -257,19 +226,18 @@ function sortByLastName($rowA, $rowB)
 $csv = new \SplFileObject('/path/to/my/csv/file.csv');
 $csv->setFlags(\SplFileObject::READ_CSV|SplFileObject::DROP_NEW_LINE);
 
-$stmt = new QueryIterator($csv);
-$nbIterations = $stmt
-    ->setOffset(3)
-    ->setLimit(2)
-    ->addWhere('filterByEmail')
-    ->addOrderBy('sortByLastName')
-    ->setSelect(function ($value) {
-        return strtoupper($value);
-    })
-    ->each(function ($row, $index, $iterator) use (&$res, $func)) {
-        $res[] = $func($row, $index, $iterator);
-        return true;
-    }); 
+$iterator = new QueryIterator($csv);
+$iterator->setOffset(3);
+$iterator->setLimit(2);
+$iterator->addWhere('filterByEmail');
+$iterator->addOrderBy('sortByLastName');
+$iterator ->setSelect(function ($value) {
+    return array_map('strtoupper', $value);
+});
+$nbIterations = $iterator->each(function ($row, $index, $iterator) use (&$res, $func)) {
+    $res[] = $func($row, $index, $iterator);
+    return true;
+}); 
 // $nbIterations is the number of successfull iterations
 // $res array contains the result of applying the $func function to the values
 ```

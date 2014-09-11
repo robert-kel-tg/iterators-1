@@ -25,8 +25,7 @@ class QueryIteratorTest extends PHPUnit_Framework_TestCase
     public function testSetLimit()
     {
         $this->stmt->setLimit(1);
-        $iterator = $this->stmt->query();
-        $res = iterator_to_array($iterator);
+        $res = iterator_to_array($this->stmt);
         $this->assertCount(1, $res);
 
         $this->stmt->setLimit(-4);
@@ -38,8 +37,7 @@ class QueryIteratorTest extends PHPUnit_Framework_TestCase
     public function testSetOffset()
     {
         $this->stmt->setOffset(1);
-        $iterator = $this->stmt->query();
-        $res = iterator_to_array($iterator);
+        $res = iterator_to_array($this->stmt);
         $this->assertCount(3, $res);
 
         $this->stmt->setOffset('toto');
@@ -49,8 +47,7 @@ class QueryIteratorTest extends PHPUnit_Framework_TestCase
     {
         $this->stmt->setOffset(3);
         $this->stmt->setLimit(10);
-        $iterator = $this->stmt->query();
-        $res = iterator_to_array($iterator);
+        $res = iterator_to_array($this->stmt);
         $this->assertSame([3 => 'bar'], $res);
         $this->assertCount(1, $res);
     }
@@ -59,8 +56,7 @@ class QueryIteratorTest extends PHPUnit_Framework_TestCase
     {
         $this->stmt->setOffset(1);
         $this->stmt->setLimit(1);
-        $iterator = $this->stmt->query();
-        $res = iterator_to_array($iterator);
+        $res = iterator_to_array($this->stmt);
         $this->assertCount(1, $res);
     }
 
@@ -71,41 +67,32 @@ class QueryIteratorTest extends PHPUnit_Framework_TestCase
         };
         $this->stmt->addWhere($func);
 
-        $iterator =$this->stmt->query();
-        $this->assertCount(2, iterator_to_array($iterator, false));
+        $this->assertCount(2, iterator_to_array($this->stmt, false));
 
         $func2 = function ($row) {
             return false !== strpos($row, 'j');
         };
         $this->stmt->addWhere($func2);
-        $this->stmt->addWhere($func);
+        $this->assertCount(1, iterator_to_array($this->stmt, false));
 
-        $iterator = $this->stmt->query();
-        $this->assertCount(1, iterator_to_array($iterator, false));
-
-        $this->stmt->addWhere($func2);
-        $this->stmt->addWhere($func);
         $this->assertTrue($this->stmt->hasWhere($func2));
         $this->stmt->removeWhere($func2);
         $this->assertFalse($this->stmt->hasWhere($func2));
 
-        $iterator = $this->stmt->query();
-        $this->assertCount(2, iterator_to_array($iterator, false));
+        $this->assertCount(2, iterator_to_array($this->stmt, false));
     }
 
     public function testOrderBy()
     {
         $this->stmt->addOrderBy('strcmp');
-        $iterator = $this->stmt->query();
-        $res = iterator_to_array($iterator, false);
+        $res = iterator_to_array($this->stmt, false);
         $this->assertSame(['bar', 'foo', 'jane', 'john'], $res);
 
         $this->stmt->addOrderBy('strcmp');
         $this->stmt->addOrderBy('strcmp');
         $this->stmt->removeOrderBy('strcmp');
         $this->assertTrue($this->stmt->hasOrderBy('strcmp'));
-        $iterator = $this->stmt->query();
-        $res = iterator_to_array($iterator, false);
+        $res = iterator_to_array($this->stmt, false);
         $this->assertSame(['bar', 'foo', 'jane', 'john'], $res);
     }
 
@@ -116,8 +103,7 @@ class QueryIteratorTest extends PHPUnit_Framework_TestCase
         };
 
         $this->stmt->setSelect($func);
-        $iterator = $this->stmt->query();
-        $this->assertSame(array_map('strtoupper', $this->data), iterator_to_array($iterator));
+        $this->assertSame(array_map('strtoupper', $this->data), iterator_to_array($this->stmt));
     }
 
     public function testSelectWhenCleared()
@@ -128,8 +114,7 @@ class QueryIteratorTest extends PHPUnit_Framework_TestCase
 
         $this->stmt->setSelect($func);
         $this->stmt->setSelect();
-        $iterator = $this->stmt->query();
-        $this->assertSame($this->data, iterator_to_array($iterator));
+        $this->assertSame($this->data, iterator_to_array($this->stmt));
     }
 
     public function testClearAll()
@@ -147,35 +132,7 @@ class QueryIteratorTest extends PHPUnit_Framework_TestCase
         $this->stmt->setOffSet(10);
         $this->stmt->setLimit(20);
         $this->stmt->clear();
-        $this->assertSame($this->data, $this->stmt->fetchAll());
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testFetchOne()
-    {
-        $func = function ($value) {
-            return strtoupper($value);
-        };
-
-        $this->stmt->setSelect($func);
-        $item = $this->stmt->fetchOne();
-        $this->assertSame('JOHN', $item);
-
-        $this->stmt->setSelect($func);
-        $this->stmt->fetchOne(-3);
-    }
-
-    public function testFetchAll()
-    {
-        $func = function ($value) {
-            return strtoupper($value);
-        };
-
-        $this->stmt->setSelect($func);
-        $res = $this->stmt->fetchAll();
-        $this->assertSame(array_values(array_map('strtoupper', $this->data)), $res);
+        $this->assertSame($this->data, iterator_to_array($this->stmt));
     }
 
     public function testEach()

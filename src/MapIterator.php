@@ -4,8 +4,8 @@
 *
 * @license http://opensource.org/licenses/MIT
 * @link https://github.com/nyamsprod/Iterator/
-* @version 0.2.0
-* @package League.csv
+* @version 0.3.0
+* @package p.iterators
 *
 * For the full copyright and license information, please view the LICENSE
 * file that was distributed with this source code.
