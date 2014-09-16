@@ -16,7 +16,6 @@ use ArrayIterator;
 use Iterator;
 use IteratorAggregate;
 use LimitIterator;
-use CallbackFilterIterator;
 use InvalidArgumentException;
 
 /**
@@ -143,7 +142,7 @@ class QueryIterator implements IteratorAggregate
      *
      * @param callable $callable
      *
-     * @return $this
+     * @return static
      */
     public function addWhere(callable $callable)
     {
@@ -157,7 +156,7 @@ class QueryIterator implements IteratorAggregate
      *
      * @param callable $callable
      *
-     * @return $this
+     * @return static
      */
     public function removeWhere(callable $callable)
     {
@@ -184,7 +183,7 @@ class QueryIterator implements IteratorAggregate
     /**
      * Remove all registered callable filter
      *
-     * @return $this
+     * @return static
      */
     public function clearWhere()
     {
@@ -205,10 +204,10 @@ class QueryIterator implements IteratorAggregate
         if (! $this->orderby) {
             return $iterator;
         }
-        $nb_callbacks = count($this->orderby);
+        $nb_callbacks  = count($this->orderby);
         $this->orderby = array_values($this->orderby);
-        $res = iterator_to_array($iterator, false);
-        uasort($res, function ($rowA, $rowB) use ($nb_callbacks) {
+        $arr = iterator_to_array($iterator);
+        uasort($arr, function ($rowA, $rowB) use ($nb_callbacks) {
             $res   = 0;
             $index = 0;
             while ($index < $nb_callbacks && 0 === $res) {
@@ -220,7 +219,7 @@ class QueryIterator implements IteratorAggregate
             return $res;
         });
 
-        return new ArrayIterator($res);
+        return new ArrayIterator($arr);
     }
 
     /**
@@ -228,7 +227,7 @@ class QueryIterator implements IteratorAggregate
      *
      * @param callable $callable
      *
-     * @return $this
+     * @return static
      */
     public function addOrderBy(callable $callable)
     {
@@ -242,7 +241,7 @@ class QueryIterator implements IteratorAggregate
      *
      * @param callable $callable
      *
-     * @return $this
+     * @return static
      */
     public function removeOrderBy(callable $callable)
     {
@@ -269,7 +268,7 @@ class QueryIterator implements IteratorAggregate
     /**
      * Remove all registered callable
      *
-     * @return $this
+     * @return static
      */
     public function clearOrderBy()
     {
@@ -299,7 +298,7 @@ class QueryIterator implements IteratorAggregate
      *
      * @param $offset
      *
-     * @return $this
+     * @return static
      */
     public function setOffset($offset = 0)
     {
@@ -316,7 +315,7 @@ class QueryIterator implements IteratorAggregate
      *
      * @param integer $limit
      *
-     * @return $this
+     * @return static
      */
     public function setLimit($limit = -1)
     {
@@ -349,7 +348,7 @@ class QueryIterator implements IteratorAggregate
      *
      * @param callable $callable
      *
-     * @return self
+     * @return static
      */
     public function setSelect(callable $callable = null)
     {
@@ -361,7 +360,7 @@ class QueryIterator implements IteratorAggregate
     /**
      * Remove all registered options
      *
-     * @return $this
+     * @return static
      */
     public function clear()
     {

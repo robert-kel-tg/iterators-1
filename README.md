@@ -52,6 +52,10 @@ spl_autoload_register(function ($class) {
 
 Or, use any other [PSR-4](http://www.php-fig.org/psr/psr-4/) compatible autoloader.
 
+## CallbackFilterIterator
+
+This class is a polyfill for PHP 5.3 which lacks the [CallbackFilterIterator](http://php.net/CallbackFilterIterator) spl class.
+
 ## MapIterator
 
 `MapIterator` extends the SPL `IteratorIterator` class. This class transforms an Iterator by applying a callable function on each iterator item. The callable function can take up to three parameters:
@@ -231,7 +235,7 @@ $iterator->setOffset(3);
 $iterator->setLimit(2);
 $iterator->addWhere('filterByEmail');
 $iterator->addOrderBy('sortByLastName');
-$iterator ->setSelect(function ($value) {
+$iterator->setSelect(function ($value) {
     return array_map('strtoupper', $value);
 });
 $nbIterations = $iterator->each(function ($row, $index, $iterator) use (&$res, $func)) {
