@@ -1,7 +1,7 @@
 Iterators
 ======
 
-[![Build Status](https://travis-ci.org/nyamsprod/IQuery.png)](https://travis-ci.org/nyamsprod/IQuery)
+[![Build Status](https://travis-ci.org/nyamsprod/Iterators.png)](https://travis-ci.org/nyamsprod/Iterators)
 
 `P\Iterators` adds two new Iterators classes `MapIteraor` and `QueryIterator` to your project.
 
@@ -20,41 +20,14 @@ You need **PHP >= 5.4.0** or **HHVM >= 3.2.0** to use `P\Iterators` but the late
 Install
 -------
 
-Install the `Iterators` package with Composer.
+Install the `p\iterators` using Composer.
 
-```json
-{
-    "require": {
-        "P\Iterators": "*"
-    }
-}
+```bash
+composer require p/iterators
 ```
 ### Going Solo
 
-You can also use `P\Iterators` without using Composer by downloading the library and registing an autoloader function:
-
-```php
-spl_autoload_register(function ($class) {
-    $prefix = 'P\\Iterators\\';
-    $base_dir = __DIR__ . '/src/';
-    $len = strlen($prefix);
-    if (strncmp($prefix, $class, $len) !== 0) {
-        // no, move to the next registered autoloader
-        return;
-    }
-    $relative_class = substr($class, $len);
-    $file = $base_dir . str_replace('\\', '/', $relative_class) . '.php';
-    if (file_exists($file)) {
-        require $file;
-    }
-});
-```
-
-Or, use any other [PSR-4](http://www.php-fig.org/psr/psr-4/) compatible autoloader.
-
-## CallbackFilterIterator
-
-This class is a polyfill for PHP 5.3 which lacks the [CallbackFilterIterator](http://php.net/CallbackFilterIterator) spl class.
+You can also use `P\Iterators` without using Composer by downloading the library and using a [PSR-4](http://www.php-fig.org/psr/psr-4/) compatible autoloader.
 
 ## MapIterator
 
