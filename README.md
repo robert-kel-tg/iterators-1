@@ -23,11 +23,11 @@ Install
 Install the `p\iterators` using Composer.
 
 ```bash
-composer require p/iterators
+$ composer require p/iterators
 ```
 ### Going Solo
 
-You can also use `P\Iterators` without using Composer by downloading the library and using a [PSR-4](http://www.php-fig.org/psr/psr-4/) compatible autoloader.
+You can also use `P\Iterators` by downloading the library and using a [PSR-4](http://www.php-fig.org/psr/psr-4/) compatible autoloader.
 
 ## MapIterator
 
@@ -42,12 +42,10 @@ Here's a simple usage:
 ```php
 use P\Iterators\MapIterator;
 
-$callable = function ($item) {
+$iterator = new ArrayIterator(['one', 'two', 'three', 'four']);
+$iterator = new MapIterator($iterator, function ($item) {
     return strtoupper($item);
-}
-
-$iterator = new \ArrayIterator(['one', 'two', 'three', 'four']);
-$iterator = new MapIterator($iterator, $callable);
+});
 
 var_dump(iterator_to_array($iterator));
 // will output something like ['ONE', 'TWO', 'THREE', 'FOUR'];
@@ -56,7 +54,7 @@ var_dump(iterator_to_array($iterator));
 
 ## QueryIterator
 
-This class enable seeking data into an Iterator using a SQL like approach. You instantiate a the `QueryIterator` class with an Iterator object. The `QueryIterator` class implements the `IteratorAggregate` interface.
+This class enable seeking data into an Iterator using a SQL like approach. You instantiate a `QueryIterator` object with an Iterator object. The `QueryIterator` class implements the `IteratorAggregate` interface.
 
 The class uses a set of methods described below. But keep in mind that:
 
@@ -64,9 +62,9 @@ The class uses a set of methods described below. But keep in mind that:
 * The query options methods can be call in any sort of order before any query execution;
 * All options follow the the *First In First Out* rule.
 
-### Filtering methods
+### Filtering methods (equivalent to SQL WHERE conditions)
 
-The filter options **are the first settings applied to the Iterator before anything else**. 
+The filter options **are the first settings applied to the Iterator before anything else**.
 
 #### addWhere(callable $callable)
 
@@ -88,7 +86,7 @@ The `addWhere` method adds a callable filter function each time it is called. Th
 
 `clearWhere` method removes all registered filter functions.
 
-### Sorting methods
+### Sorting methods (equivalent to SQL ORDER BY conditions)
 
 The sorting options are applied **after the where options**.
 
@@ -110,7 +108,7 @@ The sorting options are applied **after the where options**.
 
 `clearOrderBy` method removes all registered sorting functions.
 
-### Interval methods
+### Interval methods (equivalent to SQL OFFSET and LIMIT conditions)
 
 The methods enable returning a specific interval of Iterator items. When called more than once, only the last filtering settings is taken into account. The interval is calculated **after filtering and/or sorting but before extracting the data**.
 
@@ -118,25 +116,31 @@ The methods enable returning a specific interval of Iterator items. When called 
 
 `setOffset` method specifies an optional offset for the return data. By default the offset equals `0`.
 
+#### getOffset()
+
+`getOffset` method returns the current offset for the return data.
+
 #### setLimit($limit = -1)
 
 `setLimit` method specifies an optional maximum items to return. By default the offset equals `-1`, which translate to all items.
 
-### Selecting method
+#### getLimit()
+
+`getLimit` method returns the current limit for the return data.
+
+### Selecting method (equivalent to SQL SELECT conditions)
 
 #### setSelect(callable $callable = null)
 
 The `setSelect` method enable modifying the iterator content by specifying a callable function that will be applied on each iterator resulting items.
 
-The method can take up to three parameters:
+#### getSelect()
 
-* the current iterator data;
-* the current iterator key;
-* the iterator object;
+`getSelect` method returns the current callable function that will format the returned data if any was registered.
 
 ### Clearing all the options
 
-#### clear()
+#### clearAll()
 
 This methods clears all registered options at any given time prior to the query execution and reset them to their initial value.
 
@@ -154,69 +158,56 @@ The callable function can take up to three parameters:
 
 * the current iterator data;
 * the current iterator key;
-* the iterator object; 
+* the iterator object;
 
 The callable function **MUST** return `true` in order to continue to iterate over the original object.
 
-The method returns the number of sucessfull iterations. 
+The method returns the number of sucessfull iterations.
 
 ## Examples
 
 Here's an example on how to use the query features of the `Iterators` class:
 
 ```php
-
 use P\Iterators\QueryIterator;
 
-$file = new \SplFileObject('/path/to/my/csv/file.txt');
-$file->setFlags(\SplFileObject::DROP_NEW_LINE);
+$file = new FilesystemIterator('/path/to/my/directory');
 
 $iterator = new QueryIterator($file);
 $iterator->setOffset(3);
 $iterator->setLimit(2);
+$iterator->addOrderBy(function ($fileA, $fileB) {
+	return strcmp($fileA->getBasename(), $fileB->getBasename());
+});
 
 //iterator is a Iterator object which contains at most
-// 2 items starting from the 4 line of the file
+// 2 items starting from the 4 file
 //you can iterate over the $iterator using the foreach construct
 
-foreach ($iterator as $line) {
-    echo $line; //the selected line from the file
+foreach ($iterator as $file) {
+    echo $file->getBasename(); //the selected file
 }
 ```
 
 Using the `each` method
 
 ```php
-
 use P\Iterators\QueryIterator;
 
-function filterByEmail($row) 
-{
-    return filer_var($row[2], FILTER_VALIDATE_EMAIL);
-}
+$file = new FilesystemIterator('/path/to/my/directory');
 
-function sortByLastName($rowA, $rowB)
-{
-    return strcmp($rowB[1], $rowA[1]);
-}
-
-$csv = new \SplFileObject('/path/to/my/csv/file.csv');
-$csv->setFlags(\SplFileObject::READ_CSV|SplFileObject::DROP_NEW_LINE);
-
-$iterator = new QueryIterator($csv);
-$iterator->setOffset(3);
-$iterator->setLimit(2);
-$iterator->addWhere('filterByEmail');
-$iterator->addOrderBy('sortByLastName');
-$iterator->setSelect(function ($value) {
-    return array_map('strtoupper', $value);
+$iterator = new QueryIterator($file);
+$iterator->addOrderBy(function ($fileA, $fileB) {
+	return ! strcmp($fileA->getMTime(), $fileB->getMTime());
 });
-$nbIterations = $iterator->each(function ($row, $index, $iterator) use (&$res, $func)) {
-    $res[] = $func($row, $index, $iterator);
-    return true;
-}); 
-// $nbIterations is the number of successfull iterations
-// $res array contains the result of applying the $func function to the values
+$res = [];
+$nb_iterations = $iterator->each(function ($file) use (&$res) {
+	$res[] = json_decode(file_get_contents($file->getRealPath()), true);
+
+	return JSON_ERROR_NONE == json_last_error();
+})
+//$nb_iterations is the number of successfull iterations
+//$res contains the result of applying the callable to the values
 ```
 
 Testing

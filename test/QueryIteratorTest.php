@@ -48,6 +48,8 @@ class QueryIteratorTest extends PHPUnit_Framework_TestCase
         $this->stmt->setOffset(3);
         $this->stmt->setLimit(10);
         $res = iterator_to_array($this->stmt);
+        $this->assertSame(10, $this->stmt->getLimit());
+        $this->assertSame(3, $this->stmt->getOffset());
         $this->assertSame([3 => 'bar'], $res);
         $this->assertCount(1, $res);
     }
@@ -113,6 +115,7 @@ class QueryIteratorTest extends PHPUnit_Framework_TestCase
         };
 
         $this->stmt->setSelect($func);
+        $this->assertSame($func, $this->stmt->getSelect());
         $this->stmt->setSelect();
         $this->assertSame($this->data, iterator_to_array($this->stmt));
     }
@@ -131,7 +134,7 @@ class QueryIteratorTest extends PHPUnit_Framework_TestCase
         $this->stmt->addWhere($func);
         $this->stmt->setOffSet(10);
         $this->stmt->setLimit(20);
-        $this->stmt->clear();
+        $this->stmt->clearAll();
         $this->assertSame($this->data, iterator_to_array($this->stmt));
     }
 
