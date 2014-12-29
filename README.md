@@ -1,7 +1,12 @@
 Iterators
 ======
 
-[![Build Status](https://travis-ci.org/nyamsprod/Iterators.png)](https://travis-ci.org/nyamsprod/Iterators)
+[![Author](http://img.shields.io/badge/author-@nyamsprod-blue.svg?style=flat-square)](https://twitter.com/nyamsprod)
+[![Latest Version](https://img.shields.io/github/release/nyamsprod/Iterators.svg?style=flat-square)](https://github.com/nyamsprod/Iterators/releases)
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)<br>
+[![Build Status](https://img.shields.io/travis/nyamsprod/Iterators/master.svg?style=flat-square)](https://travis-ci.org/nyamsprod/Iterators)
+[![Coverage Status](https://img.shields.io/scrutinizer/coverage/g/nyamsprod/Iterators.svg?style=flat-square)](https://scrutinizer-ci.com/g/nyamsprod/Iterators/code-structure)
+[![Quality Score](https://img.shields.io/scrutinizer/g/nyamsprod/Iterators.svg?style=flat-square)](https://scrutinizer-ci.com/g/nyamsprod/Iterators)
 
 `P\Iterators` adds two new Iterators classes `MapIterator` and `QueryIterator` to your project.
 
