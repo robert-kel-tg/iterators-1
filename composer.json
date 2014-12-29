@@ -2,7 +2,7 @@
     "name": "p/iterators",
     "type": "library",
     "description" : "adding missing php iterator",
-    "keywords": ["Iterator", "SPL",],
+    "keywords": ["Iterator", "SPL"],
     "license": "MIT",
     "authors": [
         {
