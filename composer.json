@@ -1,8 +1,8 @@
 {
-    "name": "P/IQuery",
+    "name": "p/iterators",
     "type": "library",
-    "description" : "SQL for iterator",
-    "keywords": ["Structure", "Query", "Iterator"],
+    "description" : "adding missing php iterator",
+    "keywords": ["Iterator", "SPL",],
     "license": "MIT",
     "authors": [
         {
