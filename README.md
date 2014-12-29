@@ -3,7 +3,7 @@ Iterators
 
 [![Build Status](https://travis-ci.org/nyamsprod/Iterators.png)](https://travis-ci.org/nyamsprod/Iterators)
 
-`P\Iterators` adds two new Iterators classes `MapIteraor` and `QueryIterator` to your project.
+`P\Iterators` adds two new Iterators classes `MapIterator` and `QueryIterator` to your project.
 
 *The library is an extract of the [League\csv](http://csv.thephpleague.com) library repacked to be used on any type of `Iterator` not just `SplFileObject` objects used to treat CSV files.*
 
@@ -194,9 +194,11 @@ Using the `each` method
 ```php
 use P\Iterators\QueryIterator;
 
-$file = new FilesystemIterator('/path/to/my/directory');
-
-$iterator = new QueryIterator($file);
+$directory = new FilesystemIterator('/path/to/my/directory');
+$iterator = new QueryIterator($directory);
+$iterator->addWhere(function ($file) {
+    return 'json' == $file->getExtension();
+});
 $iterator->addOrderBy(function ($fileA, $fileB) {
 	return ! strcmp($fileA->getMTime(), $fileB->getMTime());
 });
