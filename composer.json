@@ -1,5 +1,5 @@
 {
-    "name": "p/iterators",
+    "name": "nyamsprod/iterators",
     "type": "library",
     "description" : "adding missing php iterator",
     "keywords": ["Iterator", "SPL"],
@@ -17,15 +17,15 @@
     },
     "require-dev": {
         "phpunit/phpunit" : "*"
-    },    
+    },
     "autoload": {
         "psr-4": {
-            "P\\Iterators\\": "src"
+            "Nyamsprod\\Iterators\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "P\\Iterators\\Test\\": "test"
+            "Nyamsprod\\Iterators\\Test\\": "test"
         }
     }
 }

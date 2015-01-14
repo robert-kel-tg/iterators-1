@@ -3,14 +3,14 @@
 * This file is part of the P\Iterator library
 *
 * @license http://opensource.org/licenses/MIT
-* @link https://github.com/nyamsprod/Iterator/
-* @version 0.3.0
-* @package p.iterators
+* @link https://github.com/nyamsprod/iterator/
+* @version 0.4.0
+* @package nyamsprod.iterators
 *
 * For the full copyright and license information, please view the LICENSE
 * file that was distributed with this source code.
 */
-namespace P\Iterators;
+namespace Nyamsprod\Iterators;
 
 use ArrayObject;
 use CallbackFilterIterator;
@@ -40,14 +40,14 @@ class QueryIterator implements IteratorAggregate
      *
      * @var array
      */
-    protected $where = [];
+    protected $filter = [];
 
     /**
      * Callable function to sort the ArrayObject
      *
      * @var array
      */
-    protected $orderby = [];
+    protected $sortby = [];
 
     /**
      * iterator Offset
@@ -87,9 +87,9 @@ class QueryIterator implements IteratorAggregate
      *
      * @return static
      */
-    public function addWhere(callable $callable)
+    public function addFilter(callable $callable)
     {
-        $this->where[] = $callable;
+        $this->filter[] = $callable;
 
         return $this;
     }
@@ -101,11 +101,11 @@ class QueryIterator implements IteratorAggregate
      *
      * @return static
      */
-    public function removeWhere(callable $callable)
+    public function removeFilter(callable $callable)
     {
-        $res = array_search($callable, $this->where, true);
+        $res = array_search($callable, $this->filter, true);
         if (false !== $res) {
-            unset($this->where[$res]);
+            unset($this->filter[$res]);
         }
 
         return $this;
@@ -118,9 +118,9 @@ class QueryIterator implements IteratorAggregate
      *
      * @return boolean
      */
-    public function hasWhere(callable $callable)
+    public function hasFilter(callable $callable)
     {
-        return false !== array_search($callable, $this->where, true);
+        return false !== array_search($callable, $this->filter, true);
     }
 
     /**
@@ -128,9 +128,9 @@ class QueryIterator implements IteratorAggregate
      *
      * @return static
      */
-    public function clearWhere()
+    public function clearFilter()
     {
-        $this->where = [];
+        $this->filter = [];
 
         return $this;
     }
@@ -142,9 +142,9 @@ class QueryIterator implements IteratorAggregate
      *
      * @return static
      */
-    public function addOrderBy(callable $callable)
+    public function addSortBy(callable $callable)
     {
-        $this->orderby[] = $callable;
+        $this->sortby[] = $callable;
 
         return $this;
     }
@@ -156,12 +156,12 @@ class QueryIterator implements IteratorAggregate
      *
      * @return static
      */
-    public function removeOrderBy(callable $callable)
+    public function removeSortBy(callable $callable)
     {
-        $res = array_search($callable, $this->orderby, true);
+        $res = array_search($callable, $this->sortby, true);
         if (false !== $res) {
-            unset($this->orderby[$res]);
-            $this->orderby = array_values($this->orderby);
+            unset($this->sortby[$res]);
+            $this->sortby = array_values($this->sortby);
         }
 
         return $this;
@@ -174,9 +174,9 @@ class QueryIterator implements IteratorAggregate
      *
      * @return boolean
      */
-    public function hasOrderBy(callable $callable)
+    public function hasSortBy(callable $callable)
     {
-        return false !== array_search($callable, $this->orderby, true);
+        return false !== array_search($callable, $this->sortby, true);
     }
 
     /**
@@ -184,9 +184,9 @@ class QueryIterator implements IteratorAggregate
      *
      * @return static
      */
-    public function clearOrderBy()
+    public function clearSortBy()
     {
-        $this->orderby = [];
+        $this->sortby = [];
 
         return $this;
     }
@@ -276,8 +276,8 @@ class QueryIterator implements IteratorAggregate
      */
     public function getIterator()
     {
-        $iterator = $this->applyWhere($this->iterator);
-        $iterator = $this->applyOrderBy($iterator);
+        $iterator = $this->applyFilter($this->iterator);
+        $iterator = $this->applySortBy($iterator);
         $iterator = $this->applyInterval($iterator);
 
         return $this->applySelect($iterator);
@@ -290,9 +290,9 @@ class QueryIterator implements IteratorAggregate
     *
     * @return \Iterator
     */
-    protected function applyWhere(Iterator $iterator)
+    protected function applyFilter(Iterator $iterator)
     {
-        foreach ($this->where as $callable) {
+        foreach ($this->filter as $callable) {
             $iterator = new CallbackFilterIterator($iterator, $callable);
         }
 
@@ -306,18 +306,18 @@ class QueryIterator implements IteratorAggregate
     *
     * @return \ArrayIterator
     */
-    protected function applyOrderBy(Iterator $iterator)
+    protected function applySortBy(Iterator $iterator)
     {
-        if (! $this->orderby) {
+        if (! $this->sortby) {
             return $iterator;
         }
-        $rules = count($this->orderby);
+        $rules = count($this->sortby);
         $arr = new ArrayObject(iterator_to_array($iterator));
         $arr->uasort(function ($rowA, $rowB) use ($rules) {
             $res   = 0;
             $index = 0;
             while ($index < $rules && 0 === $res) {
-                $callable = $this->orderby[$index];
+                $callable = $this->sortby[$index];
                 $res = $callable($rowA, $rowB);
                 ++$index;
             }
@@ -367,8 +367,8 @@ class QueryIterator implements IteratorAggregate
      */
     public function clearAll()
     {
-        $this->clearWhere();
-        $this->clearOrderBy();
+        $this->clearFilter();
+        $this->clearSortBy();
         $this->offset = 0;
         $this->limit  = -1;
         $this->select = null;

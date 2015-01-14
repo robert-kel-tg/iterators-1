@@ -2,13 +2,13 @@ Iterators
 ======
 
 [![Author](http://img.shields.io/badge/author-@nyamsprod-blue.svg?style=flat-square)](https://twitter.com/nyamsprod)
-[![Latest Version](https://img.shields.io/github/release/nyamsprod/Iterators.svg?style=flat-square)](https://github.com/nyamsprod/Iterators/releases)
+[![Latest Version](https://img.shields.io/github/release/nyamsprod/iterators.svg?style=flat-square)](https://github.com/nyamsprod/iterators/releases)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)<br>
-[![Build Status](https://img.shields.io/travis/nyamsprod/Iterators/master.svg?style=flat-square)](https://travis-ci.org/nyamsprod/Iterators)
-[![Coverage Status](https://img.shields.io/scrutinizer/coverage/g/nyamsprod/Iterators.svg?style=flat-square)](https://scrutinizer-ci.com/g/nyamsprod/Iterators/code-structure)
-[![Quality Score](https://img.shields.io/scrutinizer/g/nyamsprod/Iterators.svg?style=flat-square)](https://scrutinizer-ci.com/g/nyamsprod/Iterators)
+[![Build Status](https://img.shields.io/travis/nyamsprod/iterators/master.svg?style=flat-square)](https://travis-ci.org/nyamsprod/iterators)
+[![Coverage Status](https://img.shields.io/scrutinizer/coverage/g/nyamsprod/iterators.svg?style=flat-square)](https://scrutinizer-ci.com/g/nyamsprod/iterators/code-structure)
+[![Quality Score](https://img.shields.io/scrutinizer/g/nyamsprod/iterators.svg?style=flat-square)](https://scrutinizer-ci.com/g/nyamsprod/iterators)
 
-`P\Iterators` adds two new Iterators classes `MapIterator` and `QueryIterator` to your project.
+`Nyamsprod\Iterators` adds two new Iterators classes `MapIterator` and `QueryIterator` to your project.
 
 *The library is an extract of the [League\csv](http://csv.thephpleague.com) library repacked to be used on any type of `Iterator` not just `SplFileObject` objects used to treat CSV files.*
 
@@ -20,19 +20,19 @@ This package is compliant with [PSR-2], and [PSR-4].
 System Requirements
 -------
 
-You need **PHP >= 5.4.0** or **HHVM >= 3.2.0** to use `P\Iterators` but the latest stable version of PHP is recommended.
+You need **PHP >= 5.4.0** or **HHVM >= 3.2.0** to use `Nyamsprod\Iterators` but the latest stable version of PHP is recommended.
 
 Install
 -------
 
-Install the `p\iterators` using Composer.
+Install the `nyamsprod\iterators` using Composer.
 
 ```bash
-$ composer require p/iterators
+$ composer require nyamsprod/iterators
 ```
 ### Going Solo
 
-You can also use `P\Iterators` by downloading the library and using a [PSR-4](http://www.php-fig.org/psr/psr-4/) compatible autoloader.
+You can also use `Nyamsprod\Iterators` by downloading the library and using a [PSR-4](http://www.php-fig.org/psr/psr-4/) compatible autoloader.
 
 ## MapIterator
 
@@ -45,7 +45,7 @@ You can also use `P\Iterators` by downloading the library and using a [PSR-4](ht
 Here's a simple usage:
 
 ```php
-use P\Iterators\MapIterator;
+use Nyamsprod\Iterators\MapIterator;
 
 $iterator = new ArrayIterator(['one', 'two', 'three', 'four']);
 $iterator = new MapIterator($iterator, function ($item) {
@@ -71,25 +71,25 @@ The class uses a set of methods described below. But keep in mind that:
 
 The filter options **are the first settings applied to the Iterator before anything else**.
 
-#### addWhere(callable $callable)
+#### addFilter(callable $callable)
 
-The `addWhere` method adds a callable filter function each time it is called. The function can take up to three parameters:
+The `addFilter` method adds a callable filter function each time it is called. The function can take up to three parameters:
 
 * the current iterator data;
 * the current iterator key;
 * the iterator object;
 
-#### removeWhere(callable $callable)
+#### removeFilter(callable $callable)
 
-`removeWhere` method removes an already registered filter function. If the function was registered multiple times, you will have to call `removeWhere` as often as the filter was registered. **The first registered copy will be the first to be removed.**
+`removeFilter` method removes an already registered filter function. If the function was registered multiple times, you will have to call `removeFilter` as often as the filter was registered. **The first registered copy will be the first to be removed.**
 
-#### hasWhere(callable $callable)
+#### hasFilter(callable $callable)
 
-`hasWhere` method checks if the filter function is already registered
+`hasFilter` method checks if the filter function is already registered
 
-#### clearWhere()
+#### clearFilter()
 
-`clearWhere` method removes all registered filter functions.
+`clearFilter` method removes all registered filter functions.
 
 ### Sorting methods (equivalent to SQL ORDER BY conditions)
 
@@ -97,21 +97,21 @@ The sorting options are applied **after the where options**.
 
 **To sort the data `iterator_to_array` is used which could lead to performance penalty if you have a heavy `iterator` to sort**
 
-#### addOrderBy(callable $callable)
+#### addSortBy(callable $callable)
 
-`addOrderBy` method adds a sorting function each time it is called. The function takes exactly two parameters which will be filled by pairs of consecutive items in your iterator.
+`addSortBy` method adds a sorting function each time it is called. The function takes exactly two parameters which will be filled by pairs of consecutive items in your iterator.
 
-#### removeOrderBy(callable $callable)
+#### removeSortBy(callable $callable)
 
-`removeOrderBy` method removes an already registered sorting function. If the function was registered multiple times, you will have to call `removeOrderBy` as often as the function was registered. **The first registered copy will be the first to be removed.**
+`removeSortBy` method removes an already registered sorting function. If the function was registered multiple times, you will have to call `removeSortBy` as often as the function was registered. **The first registered copy will be the first to be removed.**
 
-#### hasOrderBy(callable $callable)
+#### hasSortBy(callable $callable)
 
-`hasOrderBy` method checks if the sorting function is already registered
+`hasSortBy` method checks if the sorting function is already registered
 
-#### clearOrderBy()
+#### clearSortBy()
 
-`clearOrderBy` method removes all registered sorting functions.
+`clearSortBy` method removes all registered sorting functions.
 
 ### Interval methods (equivalent to SQL OFFSET and LIMIT conditions)
 
@@ -147,7 +147,7 @@ The `setSelect` method enable modifying the iterator content by specifying a cal
 
 #### clearAll()
 
-This methods clears all registered options at any given time prior to the query execution and reset them to their initial value.
+This methods clears all registered options and reset them to their initial value.
 
 ## Query the Iterator
 
@@ -174,14 +174,14 @@ The method returns the number of sucessfull iterations.
 Here's an example on how to use the query features of the `Iterators` class:
 
 ```php
-use P\Iterators\QueryIterator;
+use Nyamsprod\Iterators\QueryIterator;
 
 $file = new FilesystemIterator('/path/to/my/directory');
 
 $iterator = new QueryIterator($file);
 $iterator->setOffset(3);
 $iterator->setLimit(2);
-$iterator->addOrderBy(function ($fileA, $fileB) {
+$iterator->addSortBy(function ($fileA, $fileB) {
 	return strcmp($fileA->getBasename(), $fileB->getBasename());
 });
 
@@ -197,14 +197,14 @@ foreach ($iterator as $file) {
 Using the `each` method
 
 ```php
-use P\Iterators\QueryIterator;
+use Nyamsprod\Iterators\QueryIterator;
 
 $directory = new FilesystemIterator('/path/to/my/directory');
 $iterator = new QueryIterator($directory);
-$iterator->addWhere(function ($file) {
+$iterator->addFilter(function ($file) {
     return 'json' == $file->getExtension();
 });
-$iterator->addOrderBy(function ($fileA, $fileB) {
+$iterator->addSortBy(function ($fileA, $fileB) {
 	return ! strcmp($fileA->getMTime(), $fileB->getMTime());
 });
 $res = [];

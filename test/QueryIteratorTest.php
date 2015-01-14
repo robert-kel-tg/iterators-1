@@ -4,7 +4,7 @@ namespace P\Iterators\test;
 
 use ArrayIterator;
 use PHPUnit_Framework_TestCase;
-use P\Iterators\QueryIterator;
+use Nyamsprod\Iterators\QueryIterator;
 
 /**
  * @group iterator
@@ -62,38 +62,38 @@ class QueryIteratorTest extends PHPUnit_Framework_TestCase
         $this->assertCount(1, $res);
     }
 
-    public function testWhere()
+    public function testFilter()
     {
         $func = function ($row) {
             return false !== strpos($row, 'o');
         };
-        $this->stmt->addWhere($func);
+        $this->stmt->addFilter($func);
 
         $this->assertCount(2, iterator_to_array($this->stmt, false));
 
         $func2 = function ($row) {
             return false !== strpos($row, 'j');
         };
-        $this->stmt->addWhere($func2);
+        $this->stmt->addFilter($func2);
         $this->assertCount(1, iterator_to_array($this->stmt, false));
 
-        $this->assertTrue($this->stmt->hasWhere($func2));
-        $this->stmt->removeWhere($func2);
-        $this->assertFalse($this->stmt->hasWhere($func2));
+        $this->assertTrue($this->stmt->hasFilter($func2));
+        $this->stmt->removeFilter($func2);
+        $this->assertFalse($this->stmt->hasFilter($func2));
 
         $this->assertCount(2, iterator_to_array($this->stmt, false));
     }
 
-    public function testOrderBy()
+    public function testSortBy()
     {
-        $this->stmt->addOrderBy('strcmp');
+        $this->stmt->addSortBy('strcmp');
         $res = iterator_to_array($this->stmt, false);
         $this->assertSame(['bar', 'foo', 'jane', 'john'], $res);
 
-        $this->stmt->addOrderBy('strcmp');
-        $this->stmt->addOrderBy('strcmp');
-        $this->stmt->removeOrderBy('strcmp');
-        $this->assertTrue($this->stmt->hasOrderBy('strcmp'));
+        $this->stmt->addSortBy('strcmp');
+        $this->stmt->addSortBy('strcmp');
+        $this->stmt->removeSortBy('strcmp');
+        $this->assertTrue($this->stmt->hasSortBy('strcmp'));
         $res = iterator_to_array($this->stmt, false);
         $this->assertSame(['bar', 'foo', 'jane', 'john'], $res);
     }
@@ -127,11 +127,11 @@ class QueryIteratorTest extends PHPUnit_Framework_TestCase
         };
 
         $this->stmt->setSelect($func);
-        $this->stmt->addOrderBy('strcmp');
+        $this->stmt->addSortBy('strcmp');
         $func = function ($row) {
             return false !== strpos($row, 'o');
         };
-        $this->stmt->addWhere($func);
+        $this->stmt->addFilter($func);
         $this->stmt->setOffSet(10);
         $this->stmt->setLimit(20);
         $this->stmt->clearAll();

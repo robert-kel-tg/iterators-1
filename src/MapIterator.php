@@ -3,14 +3,14 @@
 * This file is part of the P\Iterator library
 *
 * @license http://opensource.org/licenses/MIT
-* @link https://github.com/nyamsprod/Iterator/
-* @version 0.3.0
-* @package p.iterators
+* @link https://github.com/nyamsprod/iterator/
+* @version 0.4.0
+* @package nyamsprod.iterators
 *
 * For the full copyright and license information, please view the LICENSE
 * file that was distributed with this source code.
 */
-namespace P\Iterators;
+namespace Nyamsprod\Iterators;
 
 use IteratorIterator;
 use Traversable;
